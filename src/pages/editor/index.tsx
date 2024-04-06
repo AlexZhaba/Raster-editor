@@ -1,31 +1,35 @@
-import { useLayoutEffect, useRef } from "react"
-import { CANVAS_ROOT_ID } from "../../entities/canvas/model"
-import { Renderer } from "../../entities/renderer/model"
-import { ToolManager } from "../../entities/tools/tool-manager"
+import { useCallback, useEffect, useLayoutEffect, } from "react"
+import { useAppDispatch, useAppSelector } from "../../app/store"
+import { bindRendererUpdate, initRenderer, setIsCanvasEmpty } from "../../entities/renderer/model"
+import { initToolManager } from "../../entities/tools/model"
 import { BottomEditorInfo } from "../../widgets/bottom-editor-info"
 import { Canvas } from "../../widgets/canvas"
 import { TopEditorPanel } from "../../widgets/top-editor-panel"
-import { CanvasContext } from "./context"
 import { MainContainer } from "./styles"
 
 export const Editor: React.FC = () => {
-  const renderer = useRef<Renderer | null>(null);
-  const toolManager = useRef<ToolManager | null>(null);
+  const dispatch = useAppDispatch()
+  const canvas = useAppSelector(state => state.canvasSlice.canvas)
+
+  const onChangeCanvas = useCallback((imageCount: number) => {
+    dispatch(setIsCanvasEmpty(imageCount === 0))
+  }, [dispatch])
 
   useLayoutEffect(() => {
-    renderer.current = new Renderer(CANVAS_ROOT_ID)
-    toolManager.current = new ToolManager(renderer.current.canvas)
-  }, []);
+    dispatch(initRenderer())
+    dispatch(bindRendererUpdate(({ drawableList }) => onChangeCanvas(drawableList.length)))
+  }, [dispatch, onChangeCanvas]);
+
+  useEffect(() => {
+    if (!canvas) return;
+    dispatch(initToolManager(canvas))
+  }, [canvas, dispatch])
+
   return (
-    <CanvasContext.Provider value={{
-      renderer: renderer,
-      toolManager: toolManager
-    }}>
-      <MainContainer>
-        <TopEditorPanel />
-        <Canvas />
-        <BottomEditorInfo />
-      </MainContainer>
-    </CanvasContext.Provider>
+    <MainContainer>
+      <TopEditorPanel />
+      <Canvas />
+      <BottomEditorInfo />
+    </MainContainer>
   )
 }

@@ -7,5 +7,5 @@ export const MainContainer = styled.main`
 
   height: 100%;
 
-  background: gray;
+  background: lightgray;
 `;

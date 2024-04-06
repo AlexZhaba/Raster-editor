@@ -19,7 +19,7 @@ export class RootCanvas {
     this.root = canvasRoot;
   }
 
-  public get context() {
+  public getContext() {
     const context = this.root.getContext("2d");
     if (!context) {
       throw new Error("Context is not exist for canvas root element");
@@ -33,6 +33,6 @@ export class RootCanvas {
   }
 
   public getPixelColor(x: number, y: number) {
-    return this.context.getImageData(x, y, 1, 1).data;
+    return this.getContext().getImageData(x, y, 1, 1).data;
   }
 }

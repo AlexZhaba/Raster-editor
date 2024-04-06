@@ -1,12 +1,23 @@
 import { RootCanvas } from "../../canvas/model";
 import { DrawableObject } from "./../../drawable-object/ui/types";
 
+interface CanvasSize {
+  width: number;
+  height: number;
+}
+interface SubscribeContext {
+  drawableList: DrawableObject[];
+  size: CanvasSize;
+}
+
+export type Subscriber = (context: SubscribeContext) => void;
 export class Renderer {
   private drawableList: DrawableObject[] = [];
-  public canvas: RootCanvas;
+  private canvas: RootCanvas;
+  private subscriber: Subscriber | null = null;
 
-  constructor(id: string) {
-    this.canvas = new RootCanvas(id);
+  constructor(canvas: RootCanvas) {
+    this.canvas = canvas;
 
     this.render();
   }
@@ -16,13 +27,7 @@ export class Renderer {
     void this.render();
   }
 
-  /**
-   * Отрисовка происходит в три этапа
-   * 1. Высчитывается размеры элемента
-   * 2. Выставляются размеры канваса
-   * 3. Отрисовываются все элементы
-   */
-  public async render() {
+  public async getCanvasSize(): Promise<CanvasSize> {
     let maxWidth = 0;
     let maxHeight = 0;
 
@@ -32,11 +37,35 @@ export class Renderer {
       maxWidth = Math.max(maxWidth, width);
     }
 
-    this.canvas.setCanvasSize(maxWidth, maxHeight);
+    return {
+      width: maxWidth,
+      height: maxHeight,
+    };
+  }
 
-    const { context } = this.canvas;
+  /**
+   * Отрисовка происходит в три этапа
+   * 1. Высчитывается размеры элемента
+   * 2. Выставляются размеры канваса
+   * 3. Отрисовываются все элементы
+   */
+  public async render() {
+    const { width, height } = await this.getCanvasSize();
+
+    this.canvas.setCanvasSize(width, height);
+
+    const context = this.canvas.getContext();
     for (const drawable of this.drawableList) {
       await drawable.draw(context);
     }
+
+    this.subscriber?.({
+      drawableList: this.drawableList,
+      size: await this.getCanvasSize(),
+    });
+  }
+
+  public subscribe(subscriber: Subscriber) {
+    this.subscriber = subscriber;
   }
 }

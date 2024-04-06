@@ -1,4 +1,4 @@
-import { RootCanvas } from "./../canvas/model/canvas";
+import { RootCanvas } from "../../canvas/model/canvas";
 
 export interface PipetteToolResult {
   /**

@@ -1,13 +1,15 @@
 import { Button } from "antd";
-import React, { ChangeEventHandler, useContext } from "react";
-import { CanvasContext } from "../../pages/editor/context";
-import { DrawableImage } from "../../entities/drawable-object/ui/drawable-image";
+import React, { ChangeEventHandler } from "react";
 import { Container } from "./style";
-import { FinishCallback } from "../../entities/tools/pipette";
+import { FinishCallback, setPipetteColor, startPipetteClick } from "../../entities/tools/model";
+import { useAppDispatch, useAppSelector } from "../../app/store";
+import { addImageToCanvas } from "../../entities/renderer/model";
+import { convertToRgb } from "../../shared/lib";
 
 
 export const TopEditorPanel: React.FC = () => {
-  const context = useContext(CanvasContext)
+  const dispatch = useAppDispatch()
+  const isCanvasEmpty = useAppSelector(state => state.canvasSlice.isCanvasEmpty)
 
   const onChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const file = event.target.files?.[0]
@@ -16,20 +18,20 @@ export const TopEditorPanel: React.FC = () => {
       throw new Error('No file was provided')
     }
 
-    context?.renderer?.current?.addDrawable(new DrawableImage(file))
+    dispatch(addImageToCanvas(file))
   }
 
   const onPipetteClick = async () => {
-    context?.toolManager.current?.startTool('pipette', onPipetteFinish)
+    dispatch(startPipetteClick(onPipetteFinish))
   }
 
   const onPipetteFinish: FinishCallback = ({ pixelColor }) => {
-    console.log('pixelColor', pixelColor)
+    dispatch(setPipetteColor(convertToRgb(pixelColor)))
   }
 
   return (
     <Container>
-      <Button shape="round" onClick={onPipetteClick} ghost>
+      <Button shape="round" onClick={onPipetteClick} disabled={isCanvasEmpty}>
         Пипетка
       </Button>
       <input type="file" onChange={onChange} />

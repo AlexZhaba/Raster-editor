@@ -1,4 +1,4 @@
-import { RootCanvas } from "../canvas/model";
+import { RootCanvas } from "../../canvas/model";
 import { FinishCallback, PipetteTool } from "./pipette";
 
 type Tool = "pipette";
