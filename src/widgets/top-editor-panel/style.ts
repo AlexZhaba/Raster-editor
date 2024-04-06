@@ -1,5 +1,6 @@
 import { styled } from "styled-components";
 
 export const Container = styled.div`
-  background: red;
+  padding: 6px 18px;
+  border: 1px solid black;
 `;

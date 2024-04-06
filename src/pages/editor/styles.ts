@@ -6,4 +6,6 @@ export const MainContainer = styled.main`
   grid-template-rows: auto 1fr auto;
 
   height: 100%;
+
+  background: gray;
 `;
