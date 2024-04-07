@@ -10,11 +10,11 @@ interface SubscribeContext {
   size: CanvasSize;
 }
 
-export type Subscriber = (context: SubscribeContext) => void;
+export type RendererSubscriber = (context: SubscribeContext) => void;
 export class Renderer {
   private drawableList: DrawableObject[] = [];
   private canvas: RootCanvas;
-  private subscriber: Subscriber | null = null;
+  private subscriber: RendererSubscriber | null = null;
 
   constructor(canvas: RootCanvas) {
     this.canvas = canvas;
@@ -65,7 +65,7 @@ export class Renderer {
     });
   }
 
-  public subscribe(subscriber: Subscriber) {
+  public subscribe(subscriber: RendererSubscriber) {
     this.subscriber = subscriber;
   }
 }

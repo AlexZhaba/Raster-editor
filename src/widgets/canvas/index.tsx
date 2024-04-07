@@ -7,7 +7,7 @@ import { CanvasContainer } from "./styles";
 
 export const Canvas: React.FC = () => {
   return (
-    <Flex>
+    <Flex style={{ overflow: 'hidden', position: 'relative', margin: 50 }}>
       <CanvasContainer id={CANVAS_ROOT_ID}>
       </CanvasContainer>
     </Flex>

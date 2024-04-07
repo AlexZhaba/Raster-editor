@@ -1,15 +1,26 @@
 import { DrawableObject } from "./types";
 
 export class DrawableImage implements DrawableObject {
-  private imageFile: File;
+  private imageFile: File | Blob;
   private loadedImage: HTMLImageElement | null = null;
 
-  constructor(file: File) {
+  constructor(file: File | Blob) {
     this.imageFile = file;
   }
 
-  public static fromUrl(url: string) {
-    console.log(url);
+  public static async fromUrl(url: string): Promise<DrawableImage> {
+    const result = await fetch(url);
+
+    if (!result.ok) {
+      throw new Error("Result is not ok");
+    }
+    const buffers = await result.arrayBuffer();
+
+    const blob = new Blob([buffers], {
+      type: "application/octet-stream",
+    });
+
+    return new DrawableImage(blob);
   }
 
   public async draw(context: CanvasRenderingContext2D): Promise<void> {

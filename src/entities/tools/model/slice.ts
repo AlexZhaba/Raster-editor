@@ -3,14 +3,18 @@ import { FinishCallback } from ".";
 import { RootCanvas } from "../../canvas/model";
 import { ToolManager } from "./tool-manager";
 
+export type ActiveTool = "pipette" | null;
+
 interface InitialState {
   toolManager: ToolManager | null;
   pipetteColor: string | null;
+  activeTool: ActiveTool;
 }
 
 const initialState: InitialState = {
   toolManager: null,
   pipetteColor: null,
+  activeTool: null,
 };
 
 export const toolSlice = createSlice({
@@ -29,8 +33,15 @@ export const toolSlice = createSlice({
     setPipetteColor(state, action: PayloadAction<string>) {
       state.pipetteColor = action.payload;
     },
+    setActiveTool(state, action: PayloadAction<ActiveTool>) {
+      state.activeTool = action.payload;
+    },
   },
 });
 
-export const { initToolManager, startPipetteClick, setPipetteColor } =
-  toolSlice.actions;
+export const {
+  initToolManager,
+  startPipetteClick,
+  setPipetteColor,
+  setActiveTool,
+} = toolSlice.actions;
