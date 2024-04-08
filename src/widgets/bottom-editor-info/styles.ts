@@ -10,8 +10,13 @@ export const FooterContainer = styled.footer`
   padding: 0 40px;
 `;
 
+export const LeftContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 export const Coordinates = styled.div`
-  width: 150px;
+  width: 200px;
   padding: 0 20px;
 `;
 
@@ -24,4 +29,7 @@ export const Tools = styled.div`
 export const RightContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: 10px;
+
+  width: 350px;
 `;

@@ -11,6 +11,8 @@ interface SubscribeContext {
 }
 
 export type RendererSubscriber = (context: SubscribeContext) => void;
+
+const GRID_STEP = 30;
 export class Renderer {
   private drawableList: DrawableObject[] = [];
   private canvas: RootCanvas;
@@ -56,13 +58,39 @@ export class Renderer {
 
     const context = this.canvas.getContext();
     for (const drawable of this.drawableList) {
-      await drawable.draw(context);
+      await drawable.draw(0, 0, context);
     }
+
+    await this.drawGrid();
 
     this.subscriber?.({
       drawableList: this.drawableList,
       size: await this.getCanvasSize(),
     });
+  }
+
+  public async drawGrid() {
+    const context = this.canvas.getContext();
+    const { width, height } = await this.getCanvasSize();
+
+    context.strokeStyle = "lightgray";
+    for (let i = 0; i < width; i += GRID_STEP) {
+      context.moveTo(i, 0);
+      context.lineTo(i, height);
+      context.stroke();
+    }
+
+    for (let i = 0; i < height; i += GRID_STEP) {
+      context.moveTo(0, i);
+      context.lineTo(width, i);
+      context.stroke();
+    }
+  }
+  public scale(scaleX: number, scaleY: number) {
+    for (const drawable of this.drawableList) {
+      drawable.resize(scaleX, scaleY);
+    }
+    this.render();
   }
 
   public subscribe(subscriber: RendererSubscriber) {

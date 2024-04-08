@@ -63,7 +63,6 @@ export const FileUploader: React.FC = () => {
   }, [imageUrl])
 
   useEffect(() => {
-    console.log('isLastLoadImageFailed', isLastLoadImageFailed)
     if (isLastLoadImageFailed) {
       setIsValid(false)
     }

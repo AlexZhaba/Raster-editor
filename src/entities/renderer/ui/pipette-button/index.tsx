@@ -26,9 +26,6 @@ export const PipetteButton: React.FC = () => {
     }
   }
 
-  console.log('isPipetteAction', isPipetteAction, activeTool)
-
-
   return (
     <Container>
       <Button

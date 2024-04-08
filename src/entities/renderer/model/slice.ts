@@ -16,6 +16,8 @@ interface InitialState {
   isLoadingImage: boolean;
   isLastLoadImageFailed: boolean;
 
+  scaleInPercent: number;
+
   cursorX: number | null;
   cursorY: number | null;
 
@@ -34,6 +36,7 @@ const initialState: InitialState = {
     width: null,
     height: null,
   },
+  scaleInPercent: 100,
 };
 
 export const loadImageToCanvasByUrl = createAsyncThunk(
@@ -60,6 +63,14 @@ export const canvasSlice = createSlice({
 
     setIsCanvasEmpty(state, action: PayloadAction<boolean>) {
       state.isCanvasEmpty = action.payload;
+    },
+
+    setScale(state, action: PayloadAction<number>) {
+      state.scaleInPercent = action.payload;
+      state.renderer?.scale(
+        state.scaleInPercent / 100,
+        state.scaleInPercent / 100
+      );
     },
 
     bindRendererUpdate(state, action: PayloadAction<RendererSubscriber>) {
@@ -115,4 +126,5 @@ export const {
   bindCanvasUpdate,
   setCursor,
   setCanvasSize,
+  setScale,
 } = canvasSlice.actions;

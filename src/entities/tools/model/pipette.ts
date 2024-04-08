@@ -71,7 +71,6 @@ export class PipetteTool {
   public onKeydown(event: KeyboardEvent) {
     const isCloseEvent = event.key === "Escape";
     if (isCloseEvent) {
-      console.log("stopped");
       this.stopToolPreventually();
     }
   }
@@ -80,7 +79,6 @@ export class PipetteTool {
     const { pageX, pageY } = event;
     const { x: canvasX, y: canvasY } =
       this.canvas.convertWindowCoordinatesToCanvas(pageX, pageY);
-    console.log("canvasX", canvasX, "canvasY", canvasY);
 
     const pixelColor = this.canvas.getPixelColor(canvasX, canvasY);
 
