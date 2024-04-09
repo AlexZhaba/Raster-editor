@@ -29,12 +29,12 @@ export class Renderer {
     void this.render();
   }
 
-  public async getCanvasSize(): Promise<CanvasSize> {
+  public getCanvasSize(): CanvasSize {
     let maxWidth = 0;
     let maxHeight = 0;
 
     for (const drawable of this.drawableList) {
-      const { width, height } = await drawable.getSize();
+      const { width, height } = drawable.getSize();
       maxHeight = Math.max(maxHeight, height);
       maxWidth = Math.max(maxWidth, width);
     }
@@ -52,26 +52,27 @@ export class Renderer {
    * 3. Отрисовываются все элементы
    */
   public async render() {
-    const { width, height } = await this.getCanvasSize();
+    await Promise.resolve();
+    const { width, height } = this.getCanvasSize();
 
     this.canvas.setCanvasSize(width, height);
 
     const context = this.canvas.getContext();
     for (const drawable of this.drawableList) {
-      await drawable.draw(0, 0, context);
+      drawable.draw(0, 0, context);
     }
 
-    await this.drawGrid();
+    this.drawGrid();
 
     this.subscriber?.({
       drawableList: this.drawableList,
-      size: await this.getCanvasSize(),
+      size: this.getCanvasSize(),
     });
   }
 
   public async drawGrid() {
     const context = this.canvas.getContext();
-    const { width, height } = await this.getCanvasSize();
+    const { width, height } = this.getCanvasSize();
 
     context.strokeStyle = "lightgray";
     for (let i = 0; i < width; i += GRID_STEP) {
@@ -91,6 +92,15 @@ export class Renderer {
       drawable.resize(scaleX, scaleY);
     }
     this.render();
+  }
+
+  public getScaleCanvasToFullWidthImage(): number {
+    const { width } = this.getCanvasSize();
+
+    const targetWidth = window.innerWidth - 50 * 2;
+    const scale = targetWidth / width;
+
+    return +scale.toFixed(2);
   }
 
   public subscribe(subscriber: RendererSubscriber) {

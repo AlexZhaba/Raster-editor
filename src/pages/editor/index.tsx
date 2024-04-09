@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, } from "react"
+import { useCallback, useEffect, useLayoutEffect, useState, } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/store"
 import { CanvasSubscriber } from "../../entities/canvas/model"
 import {
@@ -8,7 +8,8 @@ import {
   setCursor,
   bindCanvasUpdate,
   RendererSubscriber,
-  setCanvasSize
+  setCanvasSize,
+  defaultResizeCanvasToFullWidthImage
 } from "../../entities/renderer/model"
 import { initToolManager } from "../../entities/tools/model"
 import { BottomEditorInfo } from "../../widgets/bottom-editor-info"
@@ -22,8 +23,13 @@ export const Editor: React.FC = () => {
   const activeTool = useAppSelector(state => state.toolSlice.activeTool);
 
   const onChangeCanvas = useCallback<RendererSubscriber>(({ drawableList, size }) => {
+    console.log('onChangeCanvas!')
     dispatch(setIsCanvasEmpty(drawableList.length === 0))
     dispatch(setCanvasSize(size))
+
+    if (drawableList.length) {
+      dispatch(defaultResizeCanvasToFullWidthImage())
+    }
   }, [dispatch])
 
   const onCanvasChange = useCallback<CanvasSubscriber>(({ x, y }) => {
@@ -32,9 +38,12 @@ export const Editor: React.FC = () => {
 
   useLayoutEffect(() => {
     dispatch(initRenderer())
-    dispatch(bindRendererUpdate(onChangeCanvas));
     dispatch(bindCanvasUpdate(onCanvasChange))
-  }, [dispatch, onCanvasChange, onChangeCanvas]);
+  }, [dispatch, onCanvasChange]);
+
+  useEffect(() => {
+    dispatch(bindRendererUpdate(onChangeCanvas));
+  }, [dispatch, onChangeCanvas])
 
   useEffect(() => {
     if (!canvas) return;

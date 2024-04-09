@@ -9,10 +9,15 @@ export class DrawableImage implements DrawableObject {
 
   constructor(file: File | Blob) {
     this.imageFile = file;
+  }
 
-    this.getImageData().then((imageData) => {
-      this.origImageData = imageData;
-    });
+  public async init() {
+    console.log("start init");
+    const imageData = await this.getImageData();
+    this.origImageData = imageData;
+    this.imageData = imageData;
+
+    console.log("end init");
   }
 
   public static async fromUrl(url: string): Promise<DrawableImage> {
@@ -35,13 +40,14 @@ export class DrawableImage implements DrawableObject {
     y: number,
     context: CanvasRenderingContext2D
   ): Promise<void> {
-    const imageData = await this.getImageData();
+    if (!this.imageData) throw new Error("123");
 
-    context.putImageData(imageData, x, y);
+    context.putImageData(this.imageData, x, y);
   }
 
-  public async getSize() {
-    const imageData = await this.getImageData();
+  public getSize() {
+    if (!this.imageData) throw new Error("");
+    const imageData = this.imageData;
 
     return {
       width: imageData.width,
@@ -50,7 +56,7 @@ export class DrawableImage implements DrawableObject {
   }
 
   public resize(scaleX: number, scaleY: number, dependsOnOrig = true): void {
-    if (!this.imageData || !this.origImageData) {
+    if (!this.origImageData) {
       throw new Error(
         "Before getting resizable image you should set image data"
       );
@@ -60,34 +66,45 @@ export class DrawableImage implements DrawableObject {
       data,
       width: currentImageDataWidth,
       height: currentImageDataHeight,
-    } = dependsOnOrig ? this.origImageData : this.imageData;
+    } = dependsOnOrig ? this.origImageData : this.imageData!;
 
-    const grouppedImageData = data.reduce<number[][][]>((acc, val, index) => {
-      const rowIndex = Math.floor(index / 4 / currentImageDataWidth);
-      const groupIndex = Math.floor(index / 4) % currentImageDataWidth;
-      if (!acc[rowIndex]) acc[rowIndex] = [];
-      if (!acc[rowIndex][groupIndex]) acc[rowIndex][groupIndex] = [];
-      acc[rowIndex][groupIndex].push(val);
-      return acc;
-    }, []);
+    console.time("groupped_image");
+    const grouppedImageData: number[][] = [];
+    for (let i = 0; i < data.length; i += 4) {
+      const rowIndex = Math.floor(i / 4 / currentImageDataWidth);
+      const groupIndex = Math.floor(i / 4) % currentImageDataWidth;
+      if (!grouppedImageData[rowIndex]) grouppedImageData[rowIndex] = [];
 
+      /**
+       * We use index of original image for increasing speed of working
+       * This way is not valid if resize algorithm can generate own value
+       */
+      grouppedImageData[rowIndex][groupIndex] = i;
+    }
+
+    console.timeEnd("groupped_image");
+
+    console.time("getting_resized_img");
     const resizedImageData = nearestNeighbourImpl(
       grouppedImageData,
       scaleX,
       scaleY
     );
 
+    console.timeEnd("getting_resized_img");
+
     const newImageWidth = Math.floor(currentImageDataWidth * scaleX);
     const newImageHeight = Math.floor(currentImageDataHeight * scaleY);
 
     const context = this.createTemporaryCanvas(newImageWidth, newImageHeight);
-
     const newImageData = context.createImageData(newImageWidth, newImageHeight);
 
     for (let i = 0; i < newImageData.data.length; i++) {
       const rowIndex = Math.floor(i / 4 / newImageWidth);
       const groupIndex = Math.floor(i / 4) % newImageWidth;
-      newImageData.data[i] = resizedImageData[rowIndex][groupIndex][i % 4];
+
+      const origImageStartIndex = resizedImageData[rowIndex][groupIndex];
+      newImageData.data[i] = data[origImageStartIndex + (i % 4)];
     }
 
     this.imageData = newImageData;

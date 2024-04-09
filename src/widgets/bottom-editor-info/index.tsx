@@ -15,9 +15,9 @@ export const BottomEditorInfo: React.FC = () => {
   const isCanvasEmpty = useAppSelector(state => state.canvasSlice.isCanvasEmpty)
   const scaleInPercent = useAppSelector(state => state.canvasSlice.scaleInPercent)
 
-  const handleScaleChange = (value: number) => {
-    dispatch(setScale(value))
-  }
+  const handleScaleChange = (value: number | null) => {
+    dispatch(setScale(value ?? 0))
+  };
 
 
   return (
@@ -32,15 +32,19 @@ export const BottomEditorInfo: React.FC = () => {
       {!isCanvasEmpty && (
         <RightContainer>
           <span>
-            Scale:
+            Scale %
           </span>
-          <div style={{ flex: 1 }}>
-            <Select
-              options={[{ value: 20, label: 20 }, { value: 50, label: 50 }, { value: 75, label: 75 }, { value: 100, label: 100 }, { value: 150, label: 150 }, { value: 250, label: 250 }, { value: 300, label: 300 }]}
-              onChange={handleScaleChange}
-              value={scaleInPercent} />
-          </div>
-          <InputNumber placeholder={"scale at %"} max={500} min={20} />
+          <Select
+            options={[{ value: 20, label: 20 }, { value: 50, label: 50 }, { value: 75, label: 75 }, { value: 100, label: 100 }, { value: 150, label: 150 }, { value: 250, label: 250 }, { value: 300, label: 300 }]}
+            onChange={handleScaleChange}
+            value={scaleInPercent} />
+          <InputNumber
+            placeholder={"scale at %"}
+            max={500}
+            min={20}
+            value={scaleInPercent}
+            onChange={handleScaleChange}
+          />
         </RightContainer>
       )}
     </FooterContainer>

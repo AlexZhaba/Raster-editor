@@ -22,6 +22,7 @@ interface InitialState {
   cursorY: number | null;
 
   canvasSize: CanvasSize;
+  defaultScaled: boolean;
 }
 
 const initialState: InitialState = {
@@ -37,12 +38,27 @@ const initialState: InitialState = {
     height: null,
   },
   scaleInPercent: 100,
+  defaultScaled: false,
 };
 
 export const loadImageToCanvasByUrl = createAsyncThunk(
   "canvasSlice/loadImageToCanvasByUrl",
   async (url: string) => {
-    return await DrawableImage.fromUrl(url);
+    const image = await DrawableImage.fromUrl(url);
+    await image.init();
+
+    return image;
+  }
+);
+
+export const loadImageToCanvasByFile = createAsyncThunk(
+  "canvasSlice/loadImageToCanvasFromFile",
+  async (file: File) => {
+    const image = new DrawableImage(file);
+    await image.init();
+
+    console.log("return");
+    return image;
   }
 );
 
@@ -77,9 +93,14 @@ export const canvasSlice = createSlice({
       state.renderer?.subscribe(action.payload);
     },
 
-    addImageToCanvas(state, action: PayloadAction<File>) {
-      if (!state.renderer) throw new Error("asd");
-      state.renderer.addDrawable(new DrawableImage(action.payload));
+    defaultResizeCanvasToFullWidthImage(state) {
+      if (state.defaultScaled) return;
+      if (!state.renderer) throw new Error("da");
+      state.defaultScaled = true;
+
+      const scaleCoef = state.renderer.getScaleCanvasToFullWidthImage();
+      state.scaleInPercent = scaleCoef * 100;
+      state.renderer.scale(scaleCoef, scaleCoef);
     },
 
     setCursor(state, action: PayloadAction<{ x: number; y: number }>) {
@@ -115,16 +136,21 @@ export const canvasSlice = createSlice({
       state.isLastLoadImageFailed = true;
       state.isLoadingImage = false;
     });
+
+    builder.addCase(loadImageToCanvasByFile.fulfilled, (state, action) => {
+      if (!state.renderer) throw new Error("asd");
+      state.renderer.addDrawable(action.payload);
+    });
   },
 });
 
 export const {
   initRenderer,
-  addImageToCanvas,
   bindRendererUpdate,
   setIsCanvasEmpty,
   bindCanvasUpdate,
   setCursor,
   setCanvasSize,
   setScale,
+  defaultResizeCanvasToFullWidthImage,
 } = canvasSlice.actions;

@@ -47,6 +47,10 @@ export class RootCanvas {
     this.subcriber = subscriber;
   }
 
+  public getBoundingClientRect() {
+    return this.root.getBoundingClientRect();
+  }
+
   public convertWindowCoordinatesToCanvas(x: number, y: number) {
     const { x: canvasDx, y: canvasDy } = this.root.getBoundingClientRect();
 

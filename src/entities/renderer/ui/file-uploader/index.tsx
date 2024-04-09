@@ -1,6 +1,6 @@
 import React, { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { Button, Input, Switch } from 'antd';
-import { addImageToCanvas } from "../../model";
+import { loadImageToCanvasByFile } from "../../model";
 import { SwitchClickEventHandler } from "antd/es/switch";
 import { FileContainer } from "./styles";
 import { isValidUrl } from "../../../../shared/lib/url";
@@ -30,7 +30,7 @@ export const FileUploader: React.FC = () => {
       throw new Error('No file was provided')
     }
 
-    dispatch(addImageToCanvas(file))
+    dispatch(loadImageToCanvasByFile(file))
   }
 
   const onModeChange: SwitchClickEventHandler = (enabled) => {
