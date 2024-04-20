@@ -12,6 +12,7 @@ export const BottomEditorInfo: React.FC = () => {
   const cursorX = useAppSelector(state => state.canvasSlice.cursorX);
   const cursorY = useAppSelector(state => state.canvasSlice.cursorY);
   const canvasSize = useAppSelector(state => state.canvasSlice.canvasSize)
+  const imagesSize = useAppSelector(state => state.canvasSlice.imagesSize);
   const isCanvasEmpty = useAppSelector(state => state.canvasSlice.isCanvasEmpty)
   const scaleInPercent = useAppSelector(state => state.canvasSlice.scaleInPercent)
 
@@ -23,6 +24,7 @@ export const BottomEditorInfo: React.FC = () => {
   return (
     <FooterContainer>
       <LeftContainer>
+        <div>Image size: {imagesSize.width ?? 0}x{imagesSize.height ?? 0}</div>
         <div>Canvas size: {canvasSize.width ?? 0}x{canvasSize.height ?? 0}</div>
         <Tools>
           <div style={{ width: 20, height: 20, background: color ?? 'black' }}></div>

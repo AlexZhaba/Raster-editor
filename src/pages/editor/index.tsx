@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState, } from "react"
+import { useCallback, useEffect, useLayoutEffect } from "react"
 import { useAppDispatch, useAppSelector } from "../../app/store"
 import { CanvasSubscriber } from "../../entities/canvas/model"
 import {
@@ -9,7 +9,8 @@ import {
   bindCanvasUpdate,
   RendererSubscriber,
   setCanvasSize,
-  defaultResizeCanvasToFullWidthImage
+  defaultResizeCanvasToFullWidthImage,
+  setImagesSize
 } from "../../entities/renderer/model"
 import { initToolManager } from "../../entities/tools/model"
 import { BottomEditorInfo } from "../../widgets/bottom-editor-info"
@@ -22,10 +23,11 @@ export const Editor: React.FC = () => {
   const canvas = useAppSelector(state => state.canvasSlice.canvas)
   const activeTool = useAppSelector(state => state.toolSlice.activeTool);
 
-  const onChangeCanvas = useCallback<RendererSubscriber>(({ drawableList, size }) => {
+  const onChangeCanvas = useCallback<RendererSubscriber>(({ drawableList, size, origSize }) => {
     console.log('onChangeCanvas!')
     dispatch(setIsCanvasEmpty(drawableList.length === 0))
     dispatch(setCanvasSize(size))
+    dispatch(setImagesSize(origSize))
 
     if (drawableList.length) {
       dispatch(defaultResizeCanvasToFullWidthImage())

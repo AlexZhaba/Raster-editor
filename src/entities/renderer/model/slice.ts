@@ -2,7 +2,7 @@ import { RootCanvas, CanvasSubscriber } from "./../../canvas/model/canvas";
 import { CANVAS_ROOT_ID } from "../../canvas/model/constants";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Renderer } from "../../renderer/model";
-import { DrawableImage } from "../../drawable-object/ui/drawable-image";
+import { DrawableImage } from "../../drawable-object/model/drawable-image";
 import { RendererSubscriber } from "./renderer";
 
 interface CanvasSize {
@@ -22,6 +22,7 @@ interface InitialState {
   cursorY: number | null;
 
   canvasSize: CanvasSize;
+  imagesSize: CanvasSize;
   defaultScaled: boolean;
 }
 
@@ -34,6 +35,10 @@ const initialState: InitialState = {
   cursorX: null,
   cursorY: null,
   canvasSize: {
+    width: null,
+    height: null,
+  },
+  imagesSize: {
     width: null,
     height: null,
   },
@@ -89,6 +94,14 @@ export const canvasSlice = createSlice({
       );
     },
 
+    resizeImages(
+      state,
+      action: PayloadAction<{ scaleX: number; scaleY: number }>
+    ) {
+      console.log(action.payload);
+      state.renderer?.resize(action.payload.scaleX, action.payload.scaleY);
+    },
+
     bindRendererUpdate(state, action: PayloadAction<RendererSubscriber>) {
       state.renderer?.subscribe(action.payload);
     },
@@ -117,6 +130,9 @@ export const canvasSlice = createSlice({
     },
     setCanvasSize(state, action: PayloadAction<CanvasSize>) {
       state.canvasSize = action.payload;
+    },
+    setImagesSize(state, action: PayloadAction<CanvasSize>) {
+      state.imagesSize = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -153,4 +169,6 @@ export const {
   setCanvasSize,
   setScale,
   defaultResizeCanvasToFullWidthImage,
+  setImagesSize,
+  resizeImages,
 } = canvasSlice.actions;

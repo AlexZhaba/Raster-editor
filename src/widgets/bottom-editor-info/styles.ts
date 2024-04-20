@@ -13,6 +13,7 @@ export const FooterContainer = styled.footer`
 export const LeftContainer = styled.div`
   display: flex;
   align-items: center;
+  gap: 10px;
 `;
 
 export const Coordinates = styled.div`

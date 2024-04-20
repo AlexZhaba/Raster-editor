@@ -10,5 +10,7 @@ export interface DrawableObject {
     context: CanvasRenderingContext2D
   ): void | Promise<void>;
   getSize(): DrawableSize;
+  getOriginalSize(): DrawableSize;
   resize(scaleX: number, scaleY: number): void;
+  scale(scaleX: number, scaleY: number): void;
 }

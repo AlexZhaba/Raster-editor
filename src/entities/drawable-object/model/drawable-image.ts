@@ -7,6 +7,8 @@ export class DrawableImage implements DrawableObject {
   private origImageData: ImageData | null = null;
   private loadedImage: HTMLImageElement | null = null;
 
+  private scalePair: [number, number] = [100, 100];
+
   constructor(file: File | Blob) {
     this.imageFile = file;
   }
@@ -45,28 +47,79 @@ export class DrawableImage implements DrawableObject {
     context.putImageData(this.imageData, x, y);
   }
 
+  /**
+   * ImageData can be scaled by `resize` method with , so `getSize` will return current image size depends on scale
+   */
   public getSize() {
     if (!this.imageData) throw new Error("");
-    const imageData = this.imageData;
+    const { width, height } = this.imageData;
 
     return {
-      width: imageData.width,
-      height: imageData.height,
+      width,
+      height,
     };
   }
 
-  public resize(scaleX: number, scaleY: number, dependsOnOrig = true): void {
+  /**
+   *
+   */
+  public getOriginalSize() {
+    if (!this.origImageData) throw new Error("");
+
+    const { width, height } = this.origImageData;
+
+    return {
+      width,
+      height,
+    };
+  }
+
+  public scale(scaleX: number, scaleY: number): void {
     if (!this.origImageData) {
       throw new Error(
         "Before getting resizable image you should set image data"
       );
     }
 
+    this.imageData = this.getResizedImageData(
+      this.origImageData,
+      scaleX,
+      scaleY
+    );
+
+    this.scalePair = [scaleX, scaleY];
+  }
+
+  public resize(scaleX: number, scaleY: number): void {
+    if (!this.origImageData) {
+      throw new Error(
+        "Before getting resizable image you should set image data"
+      );
+    }
+
+    this.origImageData = this.getResizedImageData(
+      this.origImageData,
+      scaleX,
+      scaleY
+    );
+
+    this.imageData = this.getResizedImageData(
+      this.origImageData,
+      this.scalePair[0],
+      this.scalePair[1]
+    );
+  }
+
+  private getResizedImageData(
+    imageData: ImageData,
+    scaleX: number,
+    scaleY: number
+  ): ImageData {
     const {
       data,
       width: currentImageDataWidth,
       height: currentImageDataHeight,
-    } = dependsOnOrig ? this.origImageData : this.imageData!;
+    } = imageData;
 
     console.time("groupped_image");
     const grouppedImageData: number[][] = [];
@@ -107,7 +160,7 @@ export class DrawableImage implements DrawableObject {
       newImageData.data[i] = data[origImageStartIndex + (i % 4)];
     }
 
-    this.imageData = newImageData;
+    return newImageData;
   }
 
   private loadImage(): Promise<HTMLImageElement> {

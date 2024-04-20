@@ -1,5 +1,5 @@
 import { RootCanvas } from "../../canvas/model";
-import { DrawableObject } from "./../../drawable-object/ui/types";
+import { DrawableObject } from "../../drawable-object/model/types";
 
 interface CanvasSize {
   width: number;
@@ -8,6 +8,7 @@ interface CanvasSize {
 interface SubscribeContext {
   drawableList: DrawableObject[];
   size: CanvasSize;
+  origSize: CanvasSize;
 }
 
 export type RendererSubscriber = (context: SubscribeContext) => void;
@@ -30,19 +31,11 @@ export class Renderer {
   }
 
   public getCanvasSize(): CanvasSize {
-    let maxWidth = 0;
-    let maxHeight = 0;
+    return this.getSize(false);
+  }
 
-    for (const drawable of this.drawableList) {
-      const { width, height } = drawable.getSize();
-      maxHeight = Math.max(maxHeight, height);
-      maxWidth = Math.max(maxWidth, width);
-    }
-
-    return {
-      width: maxWidth,
-      height: maxHeight,
-    };
+  public getImagesSize(): CanvasSize {
+    return this.getSize(true);
   }
 
   /**
@@ -67,6 +60,7 @@ export class Renderer {
     this.subscriber?.({
       drawableList: this.drawableList,
       size: this.getCanvasSize(),
+      origSize: this.getImagesSize(),
     });
   }
 
@@ -89,6 +83,14 @@ export class Renderer {
   }
   public scale(scaleX: number, scaleY: number) {
     for (const drawable of this.drawableList) {
+      drawable.scale(scaleX, scaleY);
+    }
+    this.render();
+  }
+
+  public resize(scaleX: number, scaleY: number) {
+    console.log("scaleX", scaleX, scaleY);
+    for (const drawable of this.drawableList) {
       drawable.resize(scaleX, scaleY);
     }
     this.render();
@@ -105,5 +107,23 @@ export class Renderer {
 
   public subscribe(subscriber: RendererSubscriber) {
     this.subscriber = subscriber;
+  }
+
+  private getSize(original: boolean) {
+    let maxWidth = 0;
+    let maxHeight = 0;
+
+    for (const drawable of this.drawableList) {
+      const { width, height } = original
+        ? drawable.getOriginalSize()
+        : drawable.getSize();
+      maxHeight = Math.max(maxHeight, height);
+      maxWidth = Math.max(maxWidth, width);
+    }
+
+    return {
+      width: maxWidth,
+      height: maxHeight,
+    };
   }
 }
