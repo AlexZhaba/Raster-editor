@@ -21,6 +21,8 @@ import { MainContainer } from "./styles"
 export const Editor: React.FC = () => {
   const dispatch = useAppDispatch()
   const canvas = useAppSelector(state => state.canvasSlice.canvas)
+  const renderer = useAppSelector(state => state.canvasSlice.renderer);
+
   const activeTool = useAppSelector(state => state.toolSlice.activeTool);
 
   const onChangeCanvas = useCallback<RendererSubscriber>(({ drawableList, size, origSize }) => {
@@ -48,9 +50,12 @@ export const Editor: React.FC = () => {
   }, [dispatch, onChangeCanvas])
 
   useEffect(() => {
-    if (!canvas) return;
-    dispatch(initToolManager(canvas))
-  }, [canvas, dispatch])
+    if (!canvas || !renderer) return;
+    dispatch(initToolManager({
+      canvas,
+      renderer,
+    }))
+  }, [canvas, dispatch, renderer])
 
   return (
     <MainContainer activeTool={activeTool}>

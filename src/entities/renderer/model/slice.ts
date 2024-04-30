@@ -3,7 +3,7 @@ import { CANVAS_ROOT_ID } from "../../canvas/model/constants";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Renderer } from "../../renderer/model";
 import { DrawableImage } from "../../drawable-object/model/drawable-image";
-import { RendererSubscriber } from "./renderer";
+import { PARENT_CONTAINER_ID, RendererSubscriber } from "./renderer";
 
 interface CanvasSize {
   width: number | null;
@@ -73,7 +73,7 @@ export const canvasSlice = createSlice({
   reducers: {
     initRenderer(state) {
       const canvas = new RootCanvas(CANVAS_ROOT_ID);
-      const renderer = new Renderer(canvas);
+      const renderer = new Renderer(PARENT_CONTAINER_ID, canvas);
       state.renderer = renderer;
       state.canvas = canvas;
     },

@@ -8,7 +8,7 @@ export type CallbackResult =
   | { isCancelled: false; result: PipetteToolResult }
   | { isCancelled: true; result: null };
 
-export type FinishCallback = (result: CallbackResult) => void;
+export type FinishCallback = (result: CallbackResult) => Promise<void>;
 
 export class PipetteTool {
   private callback: ((event: MouseEvent) => void) | null = null;
@@ -23,7 +23,8 @@ export class PipetteTool {
     this.canvas = canvas;
   }
 
-  public startTool(callback: FinishCallback) {
+  public async startTool(callback: FinishCallback) {
+    await new Promise((resolve) => setTimeout(resolve, 1e2));
     this.finishCallback = callback;
     this.callback = this.handleCanvasClick.bind(this);
     this.keydownCallback = this.onKeydown.bind(this);
@@ -44,7 +45,7 @@ export class PipetteTool {
     this.isActive = false;
   }
 
-  public stopToolPreventually() {
+  public stopTool() {
     this.removeAllEventListeners();
 
     this.finishCallback?.({
@@ -71,7 +72,7 @@ export class PipetteTool {
   public onKeydown(event: KeyboardEvent) {
     const isCloseEvent = event.key === "Escape";
     if (isCloseEvent) {
-      this.stopToolPreventually();
+      this.stopTool();
     }
   }
 

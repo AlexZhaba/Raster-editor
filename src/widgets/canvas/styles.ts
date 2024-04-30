@@ -7,3 +7,8 @@ export const CanvasContainer = styled.canvas`
   left: 50%;
   transform: translate(-50%, -50%);
 `;
+
+export const CanvasWrapper = styled.div`
+  display: flex;
+  width: 100%;
+`;

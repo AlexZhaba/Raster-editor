@@ -3,8 +3,8 @@ import { Modal, Button, InputNumber, Select, Checkbox } from 'antd'
 import { Container, DimensionInputContainer } from "./styles";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
-import { Dimension, useDimensionValue } from "../../hooks/use-dimension-value";
-import { resizeImages } from "../../../../entities/renderer";
+import { Dimension, useDimensionValue } from "../../../../widgets/top-editor-panel/hooks/use-dimension-value";
+import { resizeImages } from "../..";
 
 export const ResizeButton: React.FC = () => {
   const dispatch = useAppDispatch()

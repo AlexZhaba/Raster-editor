@@ -1,1 +1,4 @@
-export interface Tool {}
+export interface Tool {
+  startTool(name: string): void;
+  stopTool(): void;
+}

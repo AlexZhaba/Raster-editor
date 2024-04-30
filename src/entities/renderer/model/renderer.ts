@@ -1,6 +1,8 @@
 import { RootCanvas } from "../../canvas/model";
 import { DrawableObject } from "../../drawable-object/model/types";
 
+export const PARENT_CONTAINER_ID = "PARENT_CONTAINER_ID";
+
 interface CanvasSize {
   width: number;
   height: number;
@@ -11,6 +13,11 @@ interface SubscribeContext {
   origSize: CanvasSize;
 }
 
+export interface Offset {
+  dx: number;
+  dy: number;
+}
+
 export type RendererSubscriber = (context: SubscribeContext) => void;
 
 const GRID_STEP = 30;
@@ -18,9 +25,14 @@ export class Renderer {
   private drawableList: DrawableObject[] = [];
   private canvas: RootCanvas;
   private subscriber: RendererSubscriber | null = null;
+  private containerId: string;
+  private offset: Offset = { dx: 0, dy: 0 };
 
-  constructor(canvas: RootCanvas) {
+  constructor(parentId: string, canvas: RootCanvas) {
     this.canvas = canvas;
+    console.log("parentId", parentId);
+    this.containerId = parentId;
+    console.log("containerId", this.containerId);
 
     this.render();
   }
@@ -125,5 +137,21 @@ export class Renderer {
       width: maxWidth,
       height: maxHeight,
     };
+  }
+  public moveTo(dx: number, dy: number) {
+    const containerElement = document.getElementById(this.containerId);
+
+    if (!containerElement) {
+      throw new Error(
+        "containerElement does not exist for adding event listener"
+      );
+    }
+
+    console.log(dx, dy);
+
+    this.offset.dx = this.offset.dx + dx;
+    this.offset.dy = this.offset.dy + dy;
+
+    containerElement.style.transform = `translate(${this.offset.dx}px, ${this.offset.dy}px)`;
   }
 }
