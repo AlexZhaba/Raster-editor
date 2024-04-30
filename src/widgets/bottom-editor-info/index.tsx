@@ -4,6 +4,7 @@ import React from "react";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { setScale } from "../../entities/renderer";
 import { Coordinates, FooterContainer, Tools, RightContainer, LeftContainer } from "./styles";
+import { ColorPreview } from "../../shared/ui/color-preview";
 
 export const BottomEditorInfo: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +28,7 @@ export const BottomEditorInfo: React.FC = () => {
         <div>Image size: {imagesSize.width ?? 0}x{imagesSize.height ?? 0}</div>
         <div>Canvas size: {canvasSize.width ?? 0}x{canvasSize.height ?? 0}</div>
         <Tools>
-          <div style={{ width: 20, height: 20, background: color ?? 'black' }}></div>
+          <ColorPreview color={color} />
         </Tools>
         <Coordinates>Coord: {cursorX ?? '-'} : {cursorY ?? '-'}</Coordinates>
       </LeftContainer>

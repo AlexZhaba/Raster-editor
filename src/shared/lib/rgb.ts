@@ -1,2 +1,4 @@
-export const convertToRgb = (rgb: readonly [number, number, number]) =>
+import { RgbColor } from "./types";
+
+export const convertToRgb = (rgb: RgbColor) =>
   `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;

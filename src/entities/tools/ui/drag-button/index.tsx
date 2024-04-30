@@ -2,7 +2,7 @@ import { DragOutlined } from "@ant-design/icons";
 import { Button } from "antd";
 import React, { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
-import { setActiveTool, startMover, stopMover } from "../../../tools/model";
+import { setActiveTool, startMover, stopMover } from "../../model";
 import { MouseChangeStatusHandler } from "../../../../shared/lib/move-insepector";
 
 export const DragButton: React.FC = () => {
@@ -22,7 +22,7 @@ export const DragButton: React.FC = () => {
 
   const handleButtonClick = useCallback(() => {
     if (activeTool === 'mover') {
-      dispatch(stopMover())
+      dispatch(stopMover());
       return;
     }
     dispatch(setActiveTool({

@@ -3,8 +3,7 @@ import { Button } from "antd";
 import React, { MouseEventHandler, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../../../app/store";
-import { convertToRgb } from "../../../../shared/lib";
-import { FinishCallback, setActiveTool, setPipetteColor, startPipetteClick, stopPipetteClick } from "../../../tools/model";
+import { setActiveTool, startPipetteClick, stopPipetteClick } from "../../model";
 import { Container } from "./styles";
 
 export const PipetteButton: React.FC = () => {
@@ -27,16 +26,7 @@ export const PipetteButton: React.FC = () => {
       name: 'pipette',
       state: 'active'
     }))
-    dispatch(startPipetteClick(onPipetteFinish))
-  }
-
-  const onPipetteFinish: FinishCallback = async ({ isCancelled, result }) => {
-    await new Promise(resolve => setTimeout(resolve, 1e2));
-    dispatch(setActiveTool(null))
-    if (!isCancelled && result) {
-      const { pixelColor } = result;
-      dispatch(setPipetteColor(convertToRgb(pixelColor)))
-    }
+    dispatch(startPipetteClick())
   }
 
   return (

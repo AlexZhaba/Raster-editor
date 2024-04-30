@@ -12,11 +12,12 @@ import {
   defaultResizeCanvasToFullWidthImage,
   setImagesSize
 } from "../../entities/renderer/model"
-import { initToolManager } from "../../entities/tools/model"
+import { FinishCallback, initToolManager, setActiveTool, setPipetteColor, setPrimaryColor, setSecondaryColor } from "../../entities/tools/model"
 import { BottomEditorInfo } from "../../widgets/bottom-editor-info"
 import { Canvas } from "../../widgets/canvas"
 import { TopEditorPanel } from "../../widgets/top-editor-panel"
 import { MainContainer } from "./styles"
+import { convertToRgb } from "../../shared/lib"
 
 export const Editor: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -34,7 +35,26 @@ export const Editor: React.FC = () => {
     if (drawableList.length) {
       dispatch(defaultResizeCanvasToFullWidthImage())
     }
-  }, [dispatch])
+  }, [dispatch]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onPipetteFinish: FinishCallback = async ({ isCancelled, result, preview }) => {
+    await new Promise(resolve => setTimeout(resolve, 1e2));
+    if (!isCancelled && preview) {
+      const { pixelColor } = preview;
+      dispatch(setPipetteColor(pixelColor))
+    }
+
+    if (result) {
+      dispatch(setActiveTool(null))
+      const { pixelColor } = result;
+      if (result.isPrimary) {
+        dispatch(setPrimaryColor(pixelColor))
+      } else {
+        dispatch(setSecondaryColor(pixelColor))
+      }
+    }
+  }
 
   const onCanvasChange = useCallback<CanvasSubscriber>(({ x, y }) => {
     dispatch(setCursor({ x, y }))
@@ -54,8 +74,9 @@ export const Editor: React.FC = () => {
     dispatch(initToolManager({
       canvas,
       renderer,
+      onPipetteChange: onPipetteFinish,
     }))
-  }, [canvas, dispatch, renderer])
+  }, [canvas, dispatch, onPipetteFinish, renderer])
 
   return (
     <MainContainer activeTool={activeTool}>

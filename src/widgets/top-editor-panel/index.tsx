@@ -1,9 +1,9 @@
 import React from "react";
-import { Container } from "./style";
-import { FileUploader, PipetteButton } from "../../entities/renderer";
+import { Container, ToolList } from "./style";
+import { FileUploader } from "../../entities/renderer";
 
 import { ResizeButton } from "../../entities/renderer/ui/resize-button";
-import { DragButton } from "../../entities/renderer/ui/drag-button";
+import { DragButton, PipetteButton, PipettePanel } from "../../entities/tools/ui";
 
 
 export const TopEditorPanel: React.FC = () => {
@@ -11,8 +11,11 @@ export const TopEditorPanel: React.FC = () => {
   return (
     <Container>
       <FileUploader />
-      <DragButton />
-      <PipetteButton />
+      <ToolList>
+        <DragButton />
+        <PipetteButton />
+        <PipettePanel />
+      </ToolList>
       <ResizeButton />
     </Container>
   )

@@ -1,33 +1,44 @@
+import { RgbColor } from "../../../shared/lib";
 import { RootCanvas } from "../../canvas/model/canvas";
 
 export interface PipetteToolResult {
-  pixelColor: readonly [number, number, number];
+  pixelColor: RgbColor;
+  isPrimary: boolean;
 }
 
 export type CallbackResult =
-  | { isCancelled: false; result: PipetteToolResult }
-  | { isCancelled: true; result: null };
+  | {
+      isCancelled: false;
+      result: PipetteToolResult | null;
+      preview: Pick<PipetteToolResult, "pixelColor">;
+    }
+  | { isCancelled: true; result: null; preview: null };
 
 export type FinishCallback = (result: CallbackResult) => Promise<void>;
 
 export class PipetteTool {
-  private callback: ((event: MouseEvent) => void) | null = null;
-  private keydownCallback: ((event: KeyboardEvent) => void) | null = null;
-  private finishCallback: FinishCallback | null = null;
+  private callback: (event: MouseEvent) => void;
+  private keydownCallback: (event: KeyboardEvent) => void;
+  private mousemoveHandler: (event: MouseEvent) => void;
+  private finishCallback: FinishCallback;
 
   private canvas: RootCanvas;
   protected isActive = false;
-  private lastPipetteColor: readonly [number, number, number] | null = null;
+  private lastPipetteColor: RgbColor | null = null;
 
-  constructor(canvas: RootCanvas) {
+  constructor(canvas: RootCanvas, callback: FinishCallback) {
     this.canvas = canvas;
-  }
-
-  public async startTool(callback: FinishCallback) {
-    await new Promise((resolve) => setTimeout(resolve, 1e2));
-    this.finishCallback = callback;
     this.callback = this.handleCanvasClick.bind(this);
     this.keydownCallback = this.onKeydown.bind(this);
+    this.mousemoveHandler = this.onMousemove.bind(this);
+
+    document.addEventListener("mousemove", this.mousemoveHandler);
+    this.finishCallback = callback;
+  }
+
+  public async startTool() {
+    await new Promise((resolve) => setTimeout(resolve, 1e2));
+
     document.addEventListener("click", this.callback);
     document.addEventListener("keydown", this.keydownCallback);
 
@@ -51,11 +62,12 @@ export class PipetteTool {
     this.finishCallback?.({
       isCancelled: true,
       result: null,
+      preview: null,
     });
     return;
   }
 
-  private stopToolSuccessfully() {
+  private stopToolSuccessfully(isPrimary: boolean) {
     this.removeAllEventListeners();
 
     if (!this.lastPipetteColor) {
@@ -65,30 +77,53 @@ export class PipetteTool {
       isCancelled: false,
       result: {
         pixelColor: this.lastPipetteColor,
+        isPrimary,
+      },
+      preview: {
+        pixelColor: this.lastPipetteColor,
       },
     });
   }
 
-  public onKeydown(event: KeyboardEvent) {
+  private onKeydown(event: KeyboardEvent) {
     const isCloseEvent = event.key === "Escape";
     if (isCloseEvent) {
       this.stopTool();
     }
   }
 
+  private onMousemove(event: MouseEvent) {
+    const { pageX, pageY } = event;
+    const { x: canvasX, y: canvasY } =
+      this.canvas.convertWindowCoordinatesToCanvas(pageX, pageY);
+
+    const pixelColor = this.canvas.getPixelColor(canvasX, canvasY);
+    this.finishCallback?.({
+      isCancelled: false,
+      result: null,
+      preview: {
+        pixelColor: [pixelColor[0], pixelColor[1], pixelColor[2]],
+      },
+    });
+  }
+
   private handleCanvasClick(event: MouseEvent) {
+    console.log("event", event.ctrlKey);
     const { pageX, pageY } = event;
     const { x: canvasX, y: canvasY } =
       this.canvas.convertWindowCoordinatesToCanvas(pageX, pageY);
 
     const pixelColor = this.canvas.getPixelColor(canvasX, canvasY);
 
-    this.lastPipetteColor = [
-      pixelColor[0],
-      pixelColor[1],
-      pixelColor[2],
-    ] as const;
+    this.lastPipetteColor = [pixelColor[0], pixelColor[1], pixelColor[2]];
 
-    this.stopToolSuccessfully();
+    const isPrimary = !(
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      event.metaKey
+    );
+
+    this.stopToolSuccessfully(isPrimary);
   }
 }

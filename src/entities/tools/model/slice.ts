@@ -4,6 +4,7 @@ import { RootCanvas } from "../../canvas/model";
 import { ToolManager } from "./tool-manager";
 import { Renderer } from "../../renderer";
 import { MouseChangeStatusHandler } from "../../../shared/lib/move-insepector";
+import { RgbColor } from "../../../shared/lib";
 
 export interface ActivePipette {
   name: "pipette";
@@ -19,14 +20,19 @@ export type ActiveTool = ActivePipette | ActiveMover | null;
 
 interface InitialState {
   toolManager: ToolManager | null;
-  pipetteColor: string | null;
+  pipetteColor: RgbColor | null;
   activeTool: ActiveTool;
+  primaryPipetteColor: RgbColor | null;
+  secondaryPipetteColor: RgbColor | null;
 }
 
 const initialState: InitialState = {
   toolManager: null,
   pipetteColor: null,
   activeTool: null,
+
+  primaryPipetteColor: null,
+  secondaryPipetteColor: null,
 };
 
 export const toolSlice = createSlice({
@@ -35,17 +41,22 @@ export const toolSlice = createSlice({
   reducers: {
     initToolManager(
       state,
-      action: PayloadAction<{ canvas: RootCanvas; renderer: Renderer }>
+      action: PayloadAction<{
+        canvas: RootCanvas;
+        renderer: Renderer;
+        onPipetteChange: FinishCallback;
+      }>
     ) {
       state.toolManager = new ToolManager(
         action.payload.canvas,
-        action.payload.renderer
+        action.payload.renderer,
+        action.payload.onPipetteChange
       );
     },
 
-    startPipetteClick(state, action: PayloadAction<FinishCallback>) {
+    startPipetteClick(state) {
       if (!state.toolManager) throw new Error("tool manager");
-      state.toolManager.pipetteTool.startTool(action.payload);
+      state.toolManager.pipetteTool.startTool();
       console.log("startPipetteClick");
     },
 
@@ -65,8 +76,14 @@ export const toolSlice = createSlice({
       state.activeTool = null;
     },
 
-    setPipetteColor(state, action: PayloadAction<string>) {
+    setPipetteColor(state, action: PayloadAction<RgbColor>) {
       state.pipetteColor = action.payload;
+    },
+    setPrimaryColor(state, action: PayloadAction<RgbColor>) {
+      state.primaryPipetteColor = action.payload;
+    },
+    setSecondaryColor(state, action: PayloadAction<RgbColor>) {
+      state.secondaryPipetteColor = action.payload;
     },
     setActiveTool(state, action: PayloadAction<ActiveTool>) {
       if (!state.toolManager) throw new Error("tool manager");
@@ -91,4 +108,6 @@ export const {
   setActiveTool,
   startMover,
   stopMover,
+  setPrimaryColor,
+  setSecondaryColor,
 } = toolSlice.actions;

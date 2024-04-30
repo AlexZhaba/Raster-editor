@@ -1,0 +1,46 @@
+import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "../../../../app/store";
+import { ColorPreview } from "../../../../shared/ui/color-preview";
+
+import { Container, Warning } from "./styles";
+import { getContrastRatio } from "../../../../shared/lib/get-contrast-ratio";
+import { WarningOutlined } from "@ant-design/icons";
+
+export const PipettePanel: React.FC = () => {
+  const dispatch = useDispatch();
+  const activeTool = useAppSelector(state => state.toolSlice.activeTool)
+  const isPipetteAction = useMemo(() => activeTool?.name === 'pipette', [activeTool])
+  const [isOpen, setIsOpen] = useState(false);
+
+  const primaryColor = useAppSelector(state => state.toolSlice.primaryPipetteColor);
+  const secondaryColor = useAppSelector(state => state.toolSlice.secondaryPipetteColor);
+
+  const isConstrast = useMemo<null | boolean>(() => {
+    if (!primaryColor || !secondaryColor) return null;
+
+    const { isContrast: isColorContrast, ratio } = getContrastRatio(primaryColor, secondaryColor)
+    console.log('ratio', ratio)
+    return isColorContrast;
+  }, [primaryColor, secondaryColor]);
+
+  useEffect(() => {
+    if (isPipetteAction) {
+      setIsOpen(true)
+    }
+  }, [isPipetteAction]);
+
+  return (
+    <Container>
+      <ColorPreview color={primaryColor} />
+      <ColorPreview color={secondaryColor} />
+      {isConstrast !== null && !isConstrast && (
+        <Warning>
+          <WarningOutlined color="#000" width="24" height="24" />
+          Constrast is not enough
+        </Warning>
+      )
+      }
+    </Container>
+  )
+}
