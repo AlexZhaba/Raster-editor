@@ -7,16 +7,17 @@ import {
 import { Renderer } from "../../renderer";
 
 export class MoverTool {
-  private inspectors: MoveInspector[] = [
-    new DraggableMoveInspector(),
-    new KeyboardMoveInspector(),
-  ];
+  private inspectors: MoveInspector[];
   private renderer: Renderer;
 
   protected isActive = false;
 
   constructor(renderer: Renderer) {
     this.renderer = renderer;
+    this.inspectors = [
+      new DraggableMoveInspector(),
+      new KeyboardMoveInspector(),
+    ];
   }
 
   public startTool(onChangeStatus: MouseChangeStatusHandler) {
@@ -28,9 +29,16 @@ export class MoverTool {
     }
   }
 
+  public setSpeed(speedCoef: number) {
+    for (const inspector of this.inspectors) {
+      inspector.setSpeedCoef?.(speedCoef);
+    }
+  }
+
   public stopTool() {
     this.isActive = false;
     for (const inspector of this.inspectors) {
+      console.log("inspector stop");
       inspector.stop();
     }
   }

@@ -29,6 +29,7 @@ export class DraggableMoveInspector implements MoveInspector {
   }
 
   public stop() {
+    console.log("start removving");
     document.removeEventListener("mousedown", this.onMouseDownHandler);
     document.removeEventListener("mouseup", this.onMouseUpHandler);
     document.removeEventListener("mousemove", this.onMouseMoveHandler);

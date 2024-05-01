@@ -36,14 +36,20 @@ export class KeyboardMoveInspector implements MoveInspector {
     this.onMoveHandler = onMove;
   }
 
+  public setSpeedCoef(speedCoef: number) {
+    this.speedCoef = speedCoef;
+  }
+
   public inspect() {
-    document.addEventListener("keydown", this.onKeydownHandler);
-    document.addEventListener("keyup", this.onKeyUpHandler);
+    console.log("public inspect() {");
+    window.addEventListener("keydown", this.onKeydownHandler);
+    window.addEventListener("keyup", this.onKeyUpHandler);
   }
 
   public stop() {
-    document.removeEventListener("keydown", this.onKeydownHandler);
-    document.removeEventListener("keyup", this.onKeyUpHandler);
+    console.log("public stop() {");
+    window.removeEventListener("keydown", this.onKeydownHandler);
+    window.removeEventListener("keyup", this.onKeyUpHandler);
   }
 
   private onKeydown({ key }: KeyboardEvent) {

@@ -1,8 +1,8 @@
 import { DragOutlined } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, InputNumber } from "antd";
 import React, { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
-import { setActiveTool, startMover, stopMover } from "../../model";
+import { setActiveTool, setSpeedCoef, startMover, stopMover } from "../../model";
 import { MouseChangeStatusHandler } from "../../../../shared/lib/move-insepector";
 
 export const DragButton: React.FC = () => {
@@ -11,6 +11,8 @@ export const DragButton: React.FC = () => {
   const activeTool = useAppSelector(store => store.toolSlice.activeTool?.name);
   const isDragAction = useMemo(() => activeTool === 'mover', [activeTool])
 
+  const dragSpeed = useAppSelector(state => state.toolSlice.dragSpeedCoef)
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const onMoveAction: MouseChangeStatusHandler = (status) => {
     dispatch(
@@ -18,6 +20,11 @@ export const DragButton: React.FC = () => {
         { name: 'mover', 'state': status === 'start' ? 'grabbing' : 'wait' },
       )
     );
+  }
+
+  const onSpeedChange = (value: number | null) => {
+    if (!value) return;
+    dispatch(setSpeedCoef(value))
   }
 
   const handleButtonClick = useCallback(() => {
@@ -33,14 +40,19 @@ export const DragButton: React.FC = () => {
   }, [activeTool, dispatch, onMoveAction])
 
   return (
-    <Button
-      shape="round"
-      icon={<DragOutlined />}
-      onClick={handleButtonClick}
-      disabled={isCanvasEmpty}
-      type={isDragAction ? 'primary' : 'dashed'}
-    >
-      Drag
-    </Button>
+    <div className="">
+      <Button
+        shape="round"
+        icon={<DragOutlined />}
+        onClick={handleButtonClick}
+        disabled={isCanvasEmpty}
+        type={isDragAction ? 'primary' : 'dashed'}
+      >
+        Drag
+      </Button>
+      {isDragAction && (
+        <InputNumber value={dragSpeed} onChange={onSpeedChange} />
+      )}
+    </div>
   )
 }

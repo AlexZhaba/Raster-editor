@@ -1,9 +1,15 @@
+import { Renderer } from "./../../renderer/model/renderer";
 import { RgbColor } from "../../../shared/lib";
 import { RootCanvas } from "../../canvas/model/canvas";
 
+export interface PipetteMetaInfo {
+  imageX: number;
+  imageY: number;
+  isPrimary: boolean;
+}
 export interface PipetteToolResult {
   pixelColor: RgbColor;
-  isPrimary: boolean;
+  metaInfo: PipetteMetaInfo;
 }
 
 export type CallbackResult =
@@ -23,11 +29,19 @@ export class PipetteTool {
   private finishCallback: FinishCallback;
 
   private canvas: RootCanvas;
+  private renderer: Renderer;
+
   protected isActive = false;
   private lastPipetteColor: RgbColor | null = null;
 
-  constructor(canvas: RootCanvas, callback: FinishCallback) {
+  constructor(
+    canvas: RootCanvas,
+    renderer: Renderer,
+    callback: FinishCallback
+  ) {
     this.canvas = canvas;
+    this.renderer = renderer;
+
     this.callback = this.handleCanvasClick.bind(this);
     this.keydownCallback = this.onKeydown.bind(this);
     this.mousemoveHandler = this.onMousemove.bind(this);
@@ -67,7 +81,7 @@ export class PipetteTool {
     return;
   }
 
-  private stopToolSuccessfully(isPrimary: boolean) {
+  private stopToolSuccessfully(metaInfo: PipetteMetaInfo) {
     this.removeAllEventListeners();
 
     if (!this.lastPipetteColor) {
@@ -77,7 +91,7 @@ export class PipetteTool {
       isCancelled: false,
       result: {
         pixelColor: this.lastPipetteColor,
-        isPrimary,
+        metaInfo,
       },
       preview: {
         pixelColor: this.lastPipetteColor,
@@ -124,6 +138,13 @@ export class PipetteTool {
       event.metaKey
     );
 
-    this.stopToolSuccessfully(isPrimary);
+    const { x: imageX, y: imageY } =
+      this.renderer.convertCanvasCoordinatesToImage(canvasX, canvasY);
+
+    this.stopToolSuccessfully({
+      imageX,
+      imageY,
+      isPrimary,
+    });
   }
 }

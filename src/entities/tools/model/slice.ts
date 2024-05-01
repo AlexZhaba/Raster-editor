@@ -1,3 +1,4 @@
+import { PipetteMetaInfo } from "./pipette";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { FinishCallback } from ".";
 import { RootCanvas } from "../../canvas/model";
@@ -18,12 +19,19 @@ export interface ActiveMover {
 
 export type ActiveTool = ActivePipette | ActiveMover | null;
 
+export interface ColorInfo {
+  value: RgbColor;
+  metaInfo: PipetteMetaInfo;
+}
+
 interface InitialState {
   toolManager: ToolManager | null;
   pipetteColor: RgbColor | null;
   activeTool: ActiveTool;
-  primaryPipetteColor: RgbColor | null;
-  secondaryPipetteColor: RgbColor | null;
+  primaryPipetteColor: ColorInfo | null;
+  secondaryPipetteColor: ColorInfo | null;
+
+  dragSpeedCoef: number;
 }
 
 const initialState: InitialState = {
@@ -33,6 +41,7 @@ const initialState: InitialState = {
 
   primaryPipetteColor: null,
   secondaryPipetteColor: null,
+  dragSpeedCoef: 5,
 };
 
 export const toolSlice = createSlice({
@@ -47,6 +56,7 @@ export const toolSlice = createSlice({
         onPipetteChange: FinishCallback;
       }>
     ) {
+      if (state.toolManager) return;
       state.toolManager = new ToolManager(
         action.payload.canvas,
         action.payload.renderer,
@@ -72,17 +82,23 @@ export const toolSlice = createSlice({
 
     stopMover(state) {
       if (!state.toolManager) throw new Error("tool manager");
+      console.log("state.toolManager.moverTool.stopTool();");
       state.toolManager.moverTool.stopTool();
       state.activeTool = null;
+    },
+
+    setSpeedCoef(state, action: PayloadAction<number>) {
+      state.toolManager?.moverTool.setSpeed(action.payload);
+      state.dragSpeedCoef = action.payload;
     },
 
     setPipetteColor(state, action: PayloadAction<RgbColor>) {
       state.pipetteColor = action.payload;
     },
-    setPrimaryColor(state, action: PayloadAction<RgbColor>) {
+    setPrimaryColor(state, action: PayloadAction<ColorInfo>) {
       state.primaryPipetteColor = action.payload;
     },
-    setSecondaryColor(state, action: PayloadAction<RgbColor>) {
+    setSecondaryColor(state, action: PayloadAction<ColorInfo>) {
       state.secondaryPipetteColor = action.payload;
     },
     setActiveTool(state, action: PayloadAction<ActiveTool>) {
@@ -110,4 +126,5 @@ export const {
   stopMover,
   setPrimaryColor,
   setSecondaryColor,
+  setSpeedCoef,
 } = toolSlice.actions;

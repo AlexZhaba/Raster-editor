@@ -16,7 +16,7 @@ export class ToolManager {
   ) {
     this.canvas = canvas;
 
-    this.pipetteTool = new PipetteTool(this.canvas, onPipetteChange);
+    this.pipetteTool = new PipetteTool(this.canvas, renderer, onPipetteChange);
     this.moverTool = new MoverTool(renderer);
   }
 }

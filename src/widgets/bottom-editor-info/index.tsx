@@ -1,5 +1,5 @@
 
-import { InputNumber, Select, Slider } from "antd";
+import { InputNumber, Select } from "antd";
 import React from "react";
 import { useAppDispatch, useAppSelector } from "../../app/store";
 import { setScale } from "../../entities/renderer";
@@ -28,7 +28,7 @@ export const BottomEditorInfo: React.FC = () => {
         <div>Image size: {imagesSize.width ?? 0}x{imagesSize.height ?? 0}</div>
         <div>Canvas size: {canvasSize.width ?? 0}x{canvasSize.height ?? 0}</div>
         <Tools>
-          <ColorPreview color={color} />
+          <ColorPreview color={color} showMeta={false} />
         </Tools>
         <Coordinates>Coord: {cursorX ?? '-'} : {cursorY ?? '-'}</Coordinates>
       </LeftContainer>

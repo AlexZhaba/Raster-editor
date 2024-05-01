@@ -88,10 +88,7 @@ export const canvasSlice = createSlice({
 
     setScale(state, action: PayloadAction<number>) {
       state.scaleInPercent = action.payload;
-      state.renderer?.scale(
-        state.scaleInPercent / 100,
-        state.scaleInPercent / 100
-      );
+      state.renderer?.scale(state.scaleInPercent / 100);
     },
 
     resizeImages(
@@ -113,7 +110,7 @@ export const canvasSlice = createSlice({
 
       const scaleCoef = state.renderer.getScaleCanvasToFullWidthImage();
       state.scaleInPercent = scaleCoef * 100;
-      state.renderer.scale(scaleCoef, scaleCoef);
+      state.renderer.scale(scaleCoef);
     },
 
     setCursor(state, action: PayloadAction<{ x: number; y: number }>) {

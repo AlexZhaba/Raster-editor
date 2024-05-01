@@ -13,8 +13,11 @@ export const PipettePanel: React.FC = () => {
   const isPipetteAction = useMemo(() => activeTool?.name === 'pipette', [activeTool])
   const [isOpen, setIsOpen] = useState(false);
 
-  const primaryColor = useAppSelector(state => state.toolSlice.primaryPipetteColor);
-  const secondaryColor = useAppSelector(state => state.toolSlice.secondaryPipetteColor);
+  const primaryColor = useAppSelector(state => state.toolSlice.primaryPipetteColor?.value);
+  const secondaryColor = useAppSelector(state => state.toolSlice.secondaryPipetteColor?.value);
+
+  const primaryMetaInfo = useAppSelector(state => state.toolSlice.primaryPipetteColor?.metaInfo)
+  const secondaryMetaInfo = useAppSelector(state => state.toolSlice.secondaryPipetteColor?.metaInfo)
 
   const isConstrast = useMemo<null | boolean>(() => {
     if (!primaryColor || !secondaryColor) return null;
@@ -32,8 +35,8 @@ export const PipettePanel: React.FC = () => {
 
   return (
     <Container>
-      <ColorPreview color={primaryColor} />
-      <ColorPreview color={secondaryColor} />
+      <ColorPreview color={primaryColor} title={JSON.stringify(primaryMetaInfo, null, 4)} />
+      <ColorPreview color={secondaryColor} title={JSON.stringify(secondaryMetaInfo, null, 4)} />
       {isConstrast !== null && !isConstrast && (
         <Warning>
           <WarningOutlined color="#000" width="24" height="24" />

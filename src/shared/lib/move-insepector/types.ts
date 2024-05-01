@@ -7,6 +7,7 @@ export interface MoveInspector {
   onMove(handle: MouseMoveHandler): void;
   inspect(): void;
   stop(): void;
+  setSpeedCoef?(coef: number): void;
 }
 
 export type Listener<K extends keyof DocumentEventMap> = (

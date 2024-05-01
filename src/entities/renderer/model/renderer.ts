@@ -27,6 +27,7 @@ export class Renderer {
   private subscriber: RendererSubscriber | null = null;
   private containerId: string;
   private offset: Offset = { dx: 0, dy: 0 };
+  private scaleCoef = 1;
 
   constructor(parentId: string, canvas: RootCanvas) {
     this.canvas = canvas;
@@ -93,11 +94,20 @@ export class Renderer {
       context.stroke();
     }
   }
-  public scale(scaleX: number, scaleY: number) {
+  public scale(scale: number) {
+    this.scaleCoef = scale;
+
     for (const drawable of this.drawableList) {
-      drawable.scale(scaleX, scaleY);
+      drawable.scale(scale, scale);
     }
     this.render();
+  }
+
+  public convertCanvasCoordinatesToImage(x: number, y: number) {
+    return {
+      x: Math.floor(x / this.scaleCoef),
+      y: Math.floor(y / this.scaleCoef),
+    };
   }
 
   public resize(scaleX: number, scaleY: number) {

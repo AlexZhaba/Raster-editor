@@ -47,11 +47,17 @@ export const Editor: React.FC = () => {
 
     if (result) {
       dispatch(setActiveTool(null))
-      const { pixelColor } = result;
-      if (result.isPrimary) {
-        dispatch(setPrimaryColor(pixelColor))
+      const { pixelColor, metaInfo } = result;
+      if (metaInfo.isPrimary) {
+        dispatch(setPrimaryColor({
+          value: pixelColor,
+          metaInfo
+        }))
       } else {
-        dispatch(setSecondaryColor(pixelColor))
+        dispatch(setSecondaryColor({
+          value: pixelColor,
+          metaInfo
+        }))
       }
     }
   }
