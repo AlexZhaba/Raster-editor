@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/raster-editor/static/css/main.f855e6bc.css",
-    "main.js": "/raster-editor/static/js/main.d3b3d50b.js",
-    "index.html": "/raster-editor/index.html",
-    "main.f855e6bc.css.map": "/raster-editor/static/css/main.f855e6bc.css.map",
-    "main.d3b3d50b.js.map": "/raster-editor/static/js/main.d3b3d50b.js.map"
+    "main.css": "/Raster-editor/static/css/main.f855e6bc.css",
+    "main.js": "/Raster-editor/static/js/main.7cab8003.js",
+    "index.html": "/Raster-editor/index.html",
+    "main.f855e6bc.css.map": "/Raster-editor/static/css/main.f855e6bc.css.map",
+    "main.7cab8003.js.map": "/Raster-editor/static/js/main.7cab8003.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.d3b3d50b.js"
+    "static/js/main.7cab8003.js"
   ]
 }
