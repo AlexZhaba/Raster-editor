@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../../../app/store";
 import { ColorPreview } from "../../../../shared/ui/color-preview";
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Modal, Button, InputNumber, Select, Checkbox } from 'antd'
 import { Container, DimensionInputContainer } from "./styles";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
@@ -24,6 +24,13 @@ export const ResizeButton: React.FC = () => {
     valueInPercent: heightInPercent,
   } = useDimensionValue(dimension, imagesSize.height ?? 100)
 
+  const syncCoef = useMemo(
+    () =>
+      dimension === 'PERCENT' ? 1
+        : (imagesSize.height && imagesSize.width) ?
+          imagesSize.width / imagesSize.height
+          : null, [dimension, imagesSize.height, imagesSize.width])
+
   const isCanvasEmpty = useAppSelector(state => state.canvasSlice.isCanvasEmpty);
 
   const handleButtonClick = () => {
@@ -34,6 +41,18 @@ export const ResizeButton: React.FC = () => {
     setIsModalOpen(false);
   }
 
+  useEffect(() => {
+    if (isSync && imagesSize.height && imagesSize.width) {
+      if (dimension === 'PERCENT') {
+        setWidth(100);
+        setHeight(100)
+      } else {
+        setHeight(imagesSize.height);
+        setWidth(imagesSize.width)
+      }
+    }
+  }, [dimension, imagesSize, isSync, setHeight, setWidth])
+
   const handleDimensionChange = (value: Dimension) => {
     setDimension(value)
     console.log('setDimension')
@@ -43,8 +62,16 @@ export const ResizeButton: React.FC = () => {
     setIsSync(event.target.checked);
   }
 
-  const createDimensionChanger = (dimensionSetter: (value: number) => void) => (val: number | null) => {
+  const createDimensionChanger = (name: 'width' | 'height', dimensionSetter: (value: number) => void) => (val: number | null) => {
+    if (val && val > 3000) return;
     dimensionSetter(val ?? 0)
+    if (isSync && syncCoef && val) {
+      if (name === 'width') {
+        setHeight(Math.floor(val * (1 / syncCoef)))
+      } else {
+        setWidth(Math.floor(val * syncCoef))
+      }
+    }
   }
 
   const handleResizeButton = () => {
@@ -79,11 +106,11 @@ export const ResizeButton: React.FC = () => {
           </DimensionInputContainer>
           <DimensionInputContainer>
             <span>Width:</span>
-            <InputNumber value={width} onChange={createDimensionChanger(setWidth)} />
+            <InputNumber value={width} onChange={createDimensionChanger('width', setWidth)} max={3000} />
           </DimensionInputContainer>
           <DimensionInputContainer>
             <span>Height:</span>
-            <InputNumber value={height} onChange={createDimensionChanger(setHeight)} />
+            <InputNumber value={height} onChange={createDimensionChanger('height', setHeight)} max={3000} />
           </DimensionInputContainer>
           <DimensionInputContainer>
             <span>Algorithm</span>
