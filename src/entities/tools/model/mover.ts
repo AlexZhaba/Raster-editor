@@ -5,15 +5,19 @@ import {
   MoveInspector,
 } from "../../../shared/lib/move-insepector";
 import { Renderer } from "../../renderer";
+import { RootCanvas } from "../../canvas/model";
 
 export class MoverTool {
-  private inspectors: MoveInspector[];
+  private canvas: RootCanvas;
   private renderer: Renderer;
+  private inspectors: MoveInspector[];
 
   protected isActive = false;
 
-  constructor(renderer: Renderer) {
+  constructor(canvas: RootCanvas, renderer: Renderer) {
+    this.canvas = canvas;
     this.renderer = renderer;
+
     this.inspectors = [
       new DraggableMoveInspector(),
       new KeyboardMoveInspector(),
@@ -24,7 +28,7 @@ export class MoverTool {
     this.isActive = true;
     for (const inspector of this.inspectors) {
       inspector.onChangeStatus(onChangeStatus);
-      inspector.onMove(this.renderer.moveTo.bind(this.renderer));
+      inspector.onMove(this.onMove.bind(this));
       inspector.inspect();
     }
   }
@@ -41,5 +45,22 @@ export class MoverTool {
       console.log("inspector stop");
       inspector.stop();
     }
+  }
+
+  public onMove(dx: number, dy: number) {
+    const ALLOW_SPACE = 200;
+    const { bottom, left, right, top } = this.canvas.getBoundingClientRect();
+    console.log(bottom, left, right, top);
+    const invalidBorderCheck = [
+      window.innerWidth - (left + dx) - ALLOW_SPACE,
+      window.innerWidth - (window.innerWidth - right - dx) - ALLOW_SPACE,
+      window.innerHeight - (top + dy) - ALLOW_SPACE,
+      window.innerHeight - (window.innerHeight - bottom - dy) - ALLOW_SPACE,
+    ].some((val) => val <= 0);
+
+    if (invalidBorderCheck) {
+      return;
+    }
+    this.renderer.moveTo(dx, dy);
   }
 }

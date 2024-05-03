@@ -3,7 +3,7 @@ import { Tooltip } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 
 import { RgbColor, convertRgbToLab, convertRgbToXYZ, convertToRgb } from "../../lib"
-import { Container } from "./styles";
+import { Container, PipetteMeta } from "./styles";
 
 interface ColorPreviewProps {
   color: RgbColor | null | undefined;
@@ -24,11 +24,11 @@ export const ColorPreview: React.FC<ColorPreviewProps> = ({ color, title, showMe
         </Tooltip>
       )}
       {color && xyzColor && labColor && showMeta && (
-        <>
+        <PipetteMeta>
           <span>rgb: {color[0]},{color[1]},{color[2]}</span>
           <span>xyz: {xyzColor[0]},{xyzColor[1]},{xyzColor[2]}</span>
           <span>lab: {labColor[0]},{labColor[1]},{labColor[2]}</span>
-        </>
+        </PipetteMeta>
       )}
     </Container>
   )

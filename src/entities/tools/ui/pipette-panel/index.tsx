@@ -5,10 +5,9 @@ import { ColorPreview } from "../../../../shared/ui/color-preview";
 
 import { Container, Warning } from "./styles";
 import { getContrastRatio } from "../../../../shared/lib/get-contrast-ratio";
-import { WarningOutlined } from "@ant-design/icons";
+import { CloseOutlined, WarningOutlined } from "@ant-design/icons";
 
 export const PipettePanel: React.FC = () => {
-  const dispatch = useDispatch();
   const activeTool = useAppSelector(state => state.toolSlice.activeTool)
   const isPipetteAction = useMemo(() => activeTool?.name === 'pipette', [activeTool])
   const [isOpen, setIsOpen] = useState(false);
@@ -33,8 +32,18 @@ export const PipettePanel: React.FC = () => {
     }
   }, [isPipetteAction]);
 
+  const onCrossClick: React.MouseEventHandler<HTMLSpanElement> = (event) => {
+    event.stopPropagation()
+    setIsOpen(false)
+  }
+
+  if (!isOpen) {
+    return <></>
+  }
+
   return (
     <Container>
+      <CloseOutlined onClick={onCrossClick} />
       <ColorPreview color={primaryColor} title={JSON.stringify(primaryMetaInfo, null, 4)} />
       <ColorPreview color={secondaryColor} title={JSON.stringify(secondaryMetaInfo, null, 4)} />
       {isConstrast !== null && !isConstrast && (
