@@ -30,18 +30,21 @@ export const CurveButton = () => {
   const histogramDatasets: ChartDataset<'line', any>[] = useMemo<ChartDataset<'line', any>[]>(() => !rgbData ? [] : [
     {
       label: 'R',
-      data: rgbData.r,
+      data: rgbData.r.filter(v => v < 100000),
       backgroundColor: 'red',
+      borderColor: 'red',
     },
     {
-      label: 'g',
-      data: rgbData.g,
-      backgroundColor: 'green'
+      label: 'G',
+      data: rgbData.g.filter(v => v < 100000),
+      backgroundColor: 'green',
+      borderColor: 'green',
     },
     {
-      label: 'b',
-      data: rgbData.b,
-      backgroundColor: 'blue'
+      label: 'B',
+      data: rgbData.b.filter(v => v < 100000),
+      backgroundColor: 'blue',
+      borderColor: 'blue'
     },
   ], [rgbData])
 
