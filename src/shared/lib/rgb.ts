@@ -55,3 +55,31 @@ export const convertRgbToLab = (rgb: RgbColor) => {
     Math.floor(200 * (f[1] - f[2])), // b
   ];
 };
+
+/**
+ * Usage in image each of channel in range 0..255
+ */
+export interface RgbStatistic {
+  r: number[];
+  g: number[];
+  b: number[];
+}
+
+export const getRgbStatistic = (imageData: Uint8ClampedArray): RgbStatistic => {
+  const r = new Array(255).fill(0);
+  const g = new Array(255).fill(0);
+  const b = new Array(255).fill(0);
+
+  console.log("imageData.length", imageData);
+  for (let i = 0; i < imageData.length; i += 4) {
+    r[imageData[i]]++;
+    g[imageData[i + 1]]++;
+    b[imageData[i + 2]]++;
+  }
+
+  return {
+    r,
+    g,
+    b,
+  };
+};

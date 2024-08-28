@@ -1,9 +1,10 @@
+import styled from "styled-components";
 import React from "react";
 import { Container, ToolList } from "./style";
 import { FileUploader } from "../../entities/renderer";
 
-import { ResizeButton } from "../../entities/renderer/ui/resize-button";
 import { DragButton, PipetteButton, PipettePanel } from "../../entities/tools/ui";
+import { ResizeButton, CurveButton } from "../../entities/renderer";
 
 
 export const TopEditorPanel: React.FC = () => {
@@ -16,7 +17,16 @@ export const TopEditorPanel: React.FC = () => {
         <PipetteButton />
         <PipettePanel />
       </ToolList>
-      <ResizeButton />
+      <ButtonContainer>
+        <CurveButton />
+        <ResizeButton />
+      </ButtonContainer>
     </Container>
   )
 }
+
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 12px;
+`;

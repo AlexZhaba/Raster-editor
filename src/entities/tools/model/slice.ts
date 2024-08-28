@@ -27,6 +27,8 @@ export interface ColorInfo {
 interface InitialState {
   toolManager: ToolManager | null;
   pipetteColor: RgbColor | null;
+  pipetteMetaInfo: Omit<PipetteMetaInfo, "isPrimary">;
+
   activeTool: ActiveTool;
   primaryPipetteColor: ColorInfo | null;
   secondaryPipetteColor: ColorInfo | null;
@@ -38,6 +40,10 @@ const initialState: InitialState = {
   toolManager: null,
   pipetteColor: null,
   activeTool: null,
+  pipetteMetaInfo: {
+    imageY: 0,
+    imageX: 0,
+  },
 
   primaryPipetteColor: null,
   secondaryPipetteColor: null,
@@ -92,8 +98,15 @@ export const toolSlice = createSlice({
       state.dragSpeedCoef = action.payload;
     },
 
-    setPipetteColor(state, action: PayloadAction<RgbColor>) {
-      state.pipetteColor = action.payload;
+    setPipetteColor(
+      state,
+      action: PayloadAction<{
+        color: RgbColor;
+        metaInfo: Omit<PipetteMetaInfo, "isPrimary">;
+      }>
+    ) {
+      state.pipetteColor = action.payload.color;
+      state.pipetteMetaInfo = action.payload.metaInfo;
     },
     setPrimaryColor(state, action: PayloadAction<ColorInfo>) {
       state.primaryPipetteColor = action.payload;

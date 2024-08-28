@@ -16,7 +16,9 @@ export type CallbackResult =
   | {
       isCancelled: false;
       result: PipetteToolResult | null;
-      preview: Pick<PipetteToolResult, "pixelColor">;
+      preview: Pick<PipetteToolResult, "pixelColor"> & {
+        metaInfo: Pick<PipetteMetaInfo, "imageX" | "imageY">;
+      };
     }
   | { isCancelled: true; result: null; preview: null };
 
@@ -95,6 +97,7 @@ export class PipetteTool {
       },
       preview: {
         pixelColor: this.lastPipetteColor,
+        metaInfo,
       },
     });
   }
@@ -111,12 +114,19 @@ export class PipetteTool {
     const { x: canvasX, y: canvasY } =
       this.canvas.convertWindowCoordinatesToCanvas(pageX, pageY);
 
+    const { x: imageX, y: imageY } =
+      this.renderer.convertCanvasCoordinatesToImage(canvasX, canvasY);
+
     const pixelColor = this.canvas.getPixelColor(canvasX, canvasY);
     this.finishCallback?.({
       isCancelled: false,
       result: null,
       preview: {
         pixelColor: [pixelColor[0], pixelColor[1], pixelColor[2]],
+        metaInfo: {
+          imageX,
+          imageY,
+        },
       },
     });
   }

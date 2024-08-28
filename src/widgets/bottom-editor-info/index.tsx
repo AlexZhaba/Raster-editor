@@ -10,6 +10,7 @@ export const BottomEditorInfo: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const color = useAppSelector(state => state.toolSlice.pipetteColor)
+  const metaInfo = useAppSelector(state => state.toolSlice.pipetteMetaInfo)
   const cursorX = useAppSelector(state => state.canvasSlice.cursorX);
   const cursorY = useAppSelector(state => state.canvasSlice.cursorY);
   const canvasSize = useAppSelector(state => state.canvasSlice.canvasSize)
@@ -27,9 +28,14 @@ export const BottomEditorInfo: React.FC = () => {
       <LeftContainer>
         <div>Image size: {imagesSize.width ?? 0}x{imagesSize.height ?? 0}</div>
         <div>Canvas size: {canvasSize.width ?? 0}x{canvasSize.height ?? 0}</div>
-        <Tools>
-          <ColorPreview color={color} showMeta={false} />
-        </Tools>
+        {color && !isCanvasEmpty && (
+          <>
+            <Tools>
+              <ColorPreview color={color} showMeta={true} />
+            </Tools>
+            ImageCord: {metaInfo.imageX}x{metaInfo.imageY}
+          </>
+        )}
         <Coordinates>Coord: {cursorX ?? '-'} : {cursorY ?? '-'}</Coordinates>
       </LeftContainer>
       {!isCanvasEmpty && (

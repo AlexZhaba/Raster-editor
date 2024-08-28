@@ -24,6 +24,8 @@ export const Coordinates = styled.div`
 export const Tools = styled.div`
   padding: 0 20px;
 
+  min-width: 200px;
+
   border-right: 1px solid black;
 `;
 

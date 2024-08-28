@@ -13,4 +13,8 @@ export interface DrawableObject {
   getOriginalSize(): DrawableSize;
   resize(scaleX: number, scaleY: number): void;
   scale(scaleX: number, scaleY: number): void;
+  /**
+   * Not good
+   */
+  getData(): Promise<ImageData>;
 }

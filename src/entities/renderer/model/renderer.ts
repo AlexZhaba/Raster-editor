@@ -43,6 +43,10 @@ export class Renderer {
     void this.render();
   }
 
+  public getDrawable(index: number) {
+    return this.drawableList[index];
+  }
+
   public getCanvasSize(): CanvasSize {
     return this.getSize(false);
   }

@@ -4,6 +4,8 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Renderer } from "../../renderer/model";
 import { DrawableImage } from "../../drawable-object/model/drawable-image";
 import { PARENT_CONTAINER_ID, RendererSubscriber } from "./renderer";
+import { RgbStatistic, getRgbStatistic } from "../../../shared/lib";
+import { RootState } from "../../../app/store";
 
 interface CanvasSize {
   width: number | null;
@@ -20,6 +22,8 @@ interface InitialState {
 
   cursorX: number | null;
   cursorY: number | null;
+
+  rgbStat: RgbStatistic | null;
 
   canvasSize: CanvasSize;
   imagesSize: CanvasSize;
@@ -42,6 +46,7 @@ const initialState: InitialState = {
     width: null,
     height: null,
   },
+  rgbStat: null,
   scaleInPercent: 100,
   defaultScaled: false,
 };
@@ -64,6 +69,23 @@ export const loadImageToCanvasByFile = createAsyncThunk(
 
     console.log("return");
     return image;
+  }
+);
+
+export const getRgbStatisticByDrawable = createAsyncThunk(
+  "canvasSlice/getRgbStatisticByDrawable",
+  async (index: number, thunkAPI) => {
+    const state = thunkAPI.getState() as RootState;
+    console.log("state", state);
+    const drawableData = await state.canvasSlice.renderer
+      ?.getDrawable(index)
+      ?.getData();
+
+    if (!drawableData?.data) {
+      return null;
+    }
+
+    return getRgbStatistic(drawableData.data);
   }
 );
 
@@ -153,6 +175,10 @@ export const canvasSlice = createSlice({
     builder.addCase(loadImageToCanvasByFile.fulfilled, (state, action) => {
       if (!state.renderer) throw new Error("asd");
       state.renderer.addDrawable(action.payload);
+    });
+
+    builder.addCase(getRgbStatisticByDrawable.fulfilled, (state, action) => {
+      state.rgbStat = action.payload;
     });
   },
 });

@@ -15,7 +15,7 @@ export class DrawableImage implements DrawableObject {
 
   public async init() {
     console.log("start init");
-    const imageData = await this.getImageData();
+    const imageData = await this.getData();
     this.origImageData = imageData;
     this.imageData = imageData;
 
@@ -110,6 +110,27 @@ export class DrawableImage implements DrawableObject {
     );
   }
 
+  public async getData(): Promise<ImageData> {
+    if (this.imageData) return this.imageData;
+
+    if (!this.loadedImage) {
+      this.loadedImage = await this.loadImage();
+    }
+    const context = this.createTemporaryCanvas(
+      this.loadedImage.width,
+      this.loadedImage.height
+    );
+    context.drawImage(this.loadedImage, 0, 0);
+
+    this.imageData = context.getImageData(
+      0,
+      0,
+      this.loadedImage.width,
+      this.loadedImage.height
+    );
+    return this.imageData;
+  }
+
   private getResizedImageData(
     imageData: ImageData,
     scaleX: number,
@@ -172,27 +193,6 @@ export class DrawableImage implements DrawableObject {
         resolve(img);
       };
     });
-  }
-
-  private async getImageData(): Promise<ImageData> {
-    if (this.imageData) return this.imageData;
-
-    if (!this.loadedImage) {
-      this.loadedImage = await this.loadImage();
-    }
-    const context = this.createTemporaryCanvas(
-      this.loadedImage.width,
-      this.loadedImage.height
-    );
-    context.drawImage(this.loadedImage, 0, 0);
-
-    this.imageData = context.getImageData(
-      0,
-      0,
-      this.loadedImage.width,
-      this.loadedImage.height
-    );
-    return this.imageData;
   }
 
   private createTemporaryCanvas(

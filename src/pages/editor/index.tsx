@@ -41,8 +41,11 @@ export const Editor: React.FC = () => {
   const onPipetteFinish: FinishCallback = async ({ isCancelled, result, preview }) => {
     await new Promise(resolve => setTimeout(resolve, 1e2));
     if (!isCancelled && preview) {
-      const { pixelColor } = preview;
-      dispatch(setPipetteColor(pixelColor))
+      const { pixelColor, metaInfo } = preview;
+      dispatch(setPipetteColor({
+        color: pixelColor,
+        metaInfo,
+      }))
     }
 
     if (result) {
