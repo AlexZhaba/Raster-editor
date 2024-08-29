@@ -1,9 +1,12 @@
-import { Button, Modal } from "antd"
+import { Button, Input, Modal } from "antd"
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
-import { useEffect, useMemo, useState } from "react";
-import { Chart, ChartDataset, registerables } from "chart.js";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Chart, ChartData, ChartDataset, ChartOptions, registerables } from "chart.js";
 import { Line } from "react-chartjs-2";
 import { getRgbStatisticByDrawable } from "../../model";
+import { ButtonGrid, HistorgramContainer } from "./styles";
+import { ChartJSOrUndefined } from "react-chartjs-2/dist/types";
+import { getCurveLine } from "../../../../shared/lib";
 
 Chart.register(...registerables);
 
@@ -11,6 +14,8 @@ export const CurveButton = () => {
   const dispatch = useAppDispatch();
   const isCanvasEmpty = useAppSelector(state => state.canvasSlice.isCanvasEmpty);
   const rgbData = useAppSelector(state => state.canvasSlice.rgbStat)
+
+  const lineRef = useRef<ChartJSOrUndefined<'line', any>>()
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -29,29 +34,60 @@ export const CurveButton = () => {
 
   const histogramDatasets: ChartDataset<'line', any>[] = useMemo<ChartDataset<'line', any>[]>(() => !rgbData ? [] : [
     {
+      data: getCurveLine({ startX: 25, startY: 25, endX: 230, endY: 230 }),
+      borderColor: 'black',
+      borderWidth: 4,
+      pointRadius: 1,
+    },
+    {
       label: 'R',
-      data: rgbData.r.filter(v => v < 100000),
+      data: rgbData.r,
       backgroundColor: 'red',
       borderColor: 'red',
+      borderWidth: 2,
+      pointRadius: 1,
     },
     {
       label: 'G',
-      data: rgbData.g.filter(v => v < 100000),
+      data: rgbData.g,
       backgroundColor: 'green',
       borderColor: 'green',
+      borderWidth: 2,
+      pointRadius: 1,
     },
     {
       label: 'B',
-      data: rgbData.b.filter(v => v < 100000),
+      data: rgbData.b,
       backgroundColor: 'blue',
-      borderColor: 'blue'
+      borderColor: 'blue',
+      borderWidth: 2,
+      pointRadius: 1,
     },
   ], [rgbData])
 
-  const data = {
+  const data: ChartData<'line'> = {
     labels: new Array(256).fill(0).map((_, i) => i),
     datasets: histogramDatasets,
   };
+
+  const options: ChartOptions<'line'> = {
+    plugins: {
+      title: {
+        text: 'RGB digram',
+        display: true,
+      },
+      legend: {
+        display: false,
+      },
+    },
+    scales: {
+      yAxis: {
+        ticks: {
+          stepSize: 16,
+        },
+      },
+    }
+  }
 
 
   return (
@@ -59,10 +95,20 @@ export const CurveButton = () => {
       <Button type="primary" disabled={isCanvasEmpty} onClick={handleButtonClick}>
         Curve
       </Button>
-      <Modal open={isModalOpen} onCancel={handleModalCancel}>
-        Roflan modal
-        <Line data={data} />
+      <Modal open={isModalOpen} onCancel={handleModalCancel} title={"Curve"}>
+        <HistorgramContainer>
+          <Line data={data} options={options} ref={lineRef} width={400} height={400} title={'RGB diagram'} />
+        </HistorgramContainer>
 
+        <ButtonGrid>
+          <span>Input</span>
+          <Input type="number" />
+          <Input type="number" />
+          <span>Output</span>
+          <Input type="number" />
+          <Input type="number" />
+
+        </ButtonGrid>
       </Modal>
     </>
   )

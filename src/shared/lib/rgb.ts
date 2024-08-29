@@ -55,6 +55,8 @@ export const convertRgbToLab = (rgb: RgbColor) => {
     Math.floor(200 * (f[1] - f[2])), // b
   ];
 };
+export const normalizeWithMax = (maxValue: number) => (values: number[]) =>
+  values.map((val) => (val / maxValue) * 255);
 
 /**
  * Usage in image each of channel in range 0..255
@@ -64,22 +66,55 @@ export interface RgbStatistic {
   g: number[];
   b: number[];
 }
-
 export const getRgbStatistic = (imageData: Uint8ClampedArray): RgbStatistic => {
-  const r = new Array(255).fill(0);
-  const g = new Array(255).fill(0);
-  const b = new Array(255).fill(0);
+  const r = new Array(256).fill(0);
+  const g = new Array(256).fill(0);
+  const b = new Array(256).fill(0);
 
-  console.log("imageData.length", imageData);
   for (let i = 0; i < imageData.length; i += 4) {
     r[imageData[i]]++;
     g[imageData[i + 1]]++;
     b[imageData[i + 2]]++;
   }
 
+  const maxValue = Math.max(...r, ...g, ...b);
+  const normalize = normalizeWithMax(maxValue);
+
   return {
-    r,
-    g,
-    b,
+    r: normalize(r),
+    g: normalize(g),
+    b: normalize(b),
   };
+};
+
+interface CurveLine {
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+}
+
+export const getCurveLine = ({ startX, startY, endX, endY }: CurveLine) => {
+  const line = new Array(256).fill(0);
+
+  const slope = (endY - startY) / (endX - startX);
+  console.log("slope", slope);
+  const intercept = (endX * startY - startX * endY) / (endX - startX);
+  console.log("intercept", intercept);
+
+  for (let i = 0; i < 256; i++) {
+    if (i < startX) {
+      line[i] = startY;
+      continue;
+    }
+    if (i > endX) {
+      line[i] = endY;
+      continue;
+    }
+    line[i] = Math.round(i * slope + intercept);
+  }
+
+  console.log("line", line);
+
+  return line;
 };
