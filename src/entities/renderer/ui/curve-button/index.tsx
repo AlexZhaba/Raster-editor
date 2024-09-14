@@ -9,11 +9,7 @@ import {
   registerables,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import {
-  getRgbStatisticByDrawable,
-  loadImageToCanvasByFile,
-  updateCanvasByCurve,
-} from "../../model";
+import { getRgbStatisticByDrawable, updateCanvasByCurve } from "../../model";
 import {
   ButtonGrid,
   HistorgramContainer,
