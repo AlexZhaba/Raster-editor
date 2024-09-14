@@ -19,3 +19,10 @@ export const CernelTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
 `;
+
+export const BaseCoef = styled.div`
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: auto 90px;
+  align-items: center;
+`;

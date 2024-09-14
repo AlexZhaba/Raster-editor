@@ -8,21 +8,27 @@ import {
   RadioChangeEvent,
   Space,
 } from "antd";
-import { useAppSelector } from "../../../../app/store";
-import { ChangeEvent, useState } from "react";
-import { CernelTitle, MatrixContainer } from "./styles";
+import { useAppDispatch, useAppSelector } from "../../../../app/store";
+import { ChangeEvent, useEffect, useState } from "react";
+import { BaseCoef, CernelTitle, MatrixContainer } from "./styles";
 import { MATRIX_PRESET_MAP } from "./constants";
 import { Preview } from "../curve-button/preview";
 import { PreviewEmpty } from "../curve-button/styles";
+import { getFilteredImageData } from "../../../../shared/lib";
+import { updateCanvasByFilter } from "../../model";
 
 export const FilterButton = () => {
+  const dispatch = useAppDispatch();
   const isCanvasEmpty = useAppSelector(
     (state) => state.canvasSlice.isCanvasEmpty
   );
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const renderer = useAppSelector((state) => state.canvasSlice.renderer);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [matrix, setMatrix] = useState([0, 0, 0, 0, 1, 0, 0, 0, 0]);
   const [matrixPreset, setMatrixPreset] = useState("default");
+  const [baseMatrixCoef, setBaseMatrixCoef] = useState(1);
+  const [previewData, setPreviewData] = useState<ImageData>();
 
   const handleMatrixChange =
     (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -37,18 +43,51 @@ export const FilterButton = () => {
   const handleMatrixPresetChange = (event: RadioChangeEvent) => {
     const { value } = event.target;
     setMatrixPreset(value);
-    setMatrix(MATRIX_PRESET_MAP[value]);
+    setMatrix(MATRIX_PRESET_MAP[value].matrix);
+    setBaseMatrixCoef(MATRIX_PRESET_MAP[value].baseCoef);
+  };
+
+  const updatePrewiewData = async (kernel: number[], coef: number) => {
+    const result = await renderer?.getDrawable(0)?.getData();
+    if (!result) return;
+
+    const data = getFilteredImageData(
+      result.data,
+      result.width,
+      result.height,
+      kernel,
+      coef
+    );
+    console.log("yes");
+    const imageData = new ImageData(result.width, result.height);
+    imageData.data.set(data);
+    setPreviewData(imageData);
   };
 
   const handleResetButton = () => {
     setMatrixPreset("default");
-    setMatrix(MATRIX_PRESET_MAP["default"]);
+    setMatrix(MATRIX_PRESET_MAP["default"].matrix);
+    setBaseMatrixCoef(MATRIX_PRESET_MAP["default"].baseCoef);
   };
+
+  const handleOkButton = () => {
+    dispatch(
+      updateCanvasByFilter({
+        kernel: matrix,
+        kernelBaseCoef: baseMatrixCoef,
+      })
+    );
+    setIsModalOpen(false);
+  };
+
+  useEffect(() => {
+    updatePrewiewData(matrix, baseMatrixCoef);
+  }, [matrix, isModalOpen, baseMatrixCoef]);
 
   return (
     <>
       <Button
-        disabled={false}
+        disabled={isCanvasEmpty}
         onClick={() => setIsModalOpen(true)}
         type="primary"
       >
@@ -58,6 +97,7 @@ export const FilterButton = () => {
         title="Image filtering"
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
+        onOk={handleOkButton}
         width={700}
       >
         <Flex justify="center" gap={20}>
@@ -73,6 +113,17 @@ export const FilterButton = () => {
                   />
                 ))}
             </MatrixContainer>
+            <BaseCoef>
+              <span>Base kernel coef</span>
+              <Input
+                title="Base coef"
+                value={baseMatrixCoef}
+                type="number"
+                onChange={(event) =>
+                  setBaseMatrixCoef(Number(event.currentTarget.value))
+                }
+              />
+            </BaseCoef>
             <Flex gap={16} vertical={true} align="flex-start">
               <CernelTitle>
                 <span>Cernel preset:</span>
@@ -99,11 +150,15 @@ export const FilterButton = () => {
               </Flex>
             </Flex>
           </div>
-          <div style={{ width: 400, height: 400, paddingBottom: 20 }}>
-            <PreviewEmpty>
-              <span>Press "Show preview" to look result</span>
-            </PreviewEmpty>
-          </div>
+          {isPreviewOpen && previewData ? (
+            <Preview drawableData={previewData} />
+          ) : (
+            <div style={{ width: 400, height: 400, paddingBottom: 20 }}>
+              <PreviewEmpty>
+                <span>Press "Show preview" to look result</span>
+              </PreviewEmpty>
+            </div>
+          )}
         </Flex>
       </Modal>
     </>

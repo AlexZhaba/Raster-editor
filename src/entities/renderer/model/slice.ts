@@ -6,10 +6,12 @@ import { DrawableImage } from "../../drawable-object/model/drawable-image";
 import { PARENT_CONTAINER_ID, RendererSubscriber } from "./renderer";
 import {
   RgbStatistic,
+  getFilteredImageData,
   getRgbStatistic,
   toneCorrectionByCurveLine,
 } from "../../../shared/lib";
 import { RootState } from "../../../app/store";
+import { create } from "lodash";
 
 interface CanvasSize {
   width: number | null;
@@ -96,6 +98,36 @@ export const updateCanvasByCurve = createAsyncThunk(
   }
 );
 
+interface FilterOptions {
+  kernel: number[];
+  kernelBaseCoef: number;
+}
+
+export const updateCanvasByFilter = createAsyncThunk(
+  "canvasSlice/updateCanvasWithImageData",
+  async ({ kernel, kernelBaseCoef }: FilterOptions, thunkAPI) => {
+    const state = thunkAPI.getState() as RootState;
+    const renderer = state.canvasSlice.renderer;
+    if (!renderer) return;
+
+    const prevImageData = await renderer.getDrawable(0)?.getData();
+    const newImageData = getFilteredImageData(
+      prevImageData.data,
+      prevImageData.width,
+      prevImageData.height,
+      kernel,
+      kernelBaseCoef
+    );
+    renderer?.removeAllDrawable();
+
+    const imageData = new ImageData(prevImageData.width, prevImageData.height);
+    imageData.data.set(newImageData);
+
+    const blob = new Blob([newImageData], {});
+    const image = new DrawableImage(blob, imageData);
+    renderer?.addDrawable(image);
+  }
+);
 export const getRgbStatisticByDrawable = createAsyncThunk(
   "canvasSlice/getRgbStatisticByDrawable",
   async (index: number, thunkAPI) => {
