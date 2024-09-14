@@ -47,6 +47,11 @@ export class Renderer {
     return this.drawableList[index];
   }
 
+  public removeAllDrawable() {
+    this.drawableList = [];
+    void this.render();
+  }
+
   public getCanvasSize(): CanvasSize {
     return this.getSize(false);
   }
@@ -71,8 +76,6 @@ export class Renderer {
     for (const drawable of this.drawableList) {
       drawable.draw(0, 0, context);
     }
-
-    this.drawGrid();
 
     this.subscriber?.({
       drawableList: this.drawableList,

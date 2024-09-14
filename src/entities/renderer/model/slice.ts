@@ -4,7 +4,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Renderer } from "../../renderer/model";
 import { DrawableImage } from "../../drawable-object/model/drawable-image";
 import { PARENT_CONTAINER_ID, RendererSubscriber } from "./renderer";
-import { RgbStatistic, getRgbStatistic } from "../../../shared/lib";
+import {
+  RgbStatistic,
+  getRgbStatistic,
+  toneCorrectionByCurveLine,
+} from "../../../shared/lib";
 import { RootState } from "../../../app/store";
 
 interface CanvasSize {
@@ -63,12 +67,32 @@ export const loadImageToCanvasByUrl = createAsyncThunk(
 
 export const loadImageToCanvasByFile = createAsyncThunk(
   "canvasSlice/loadImageToCanvasFromFile",
-  async (file: File) => {
+  async (file: File | Blob) => {
     const image = new DrawableImage(file);
     await image.init();
 
     console.log("return");
     return image;
+  }
+);
+
+export const updateCanvasByCurve = createAsyncThunk(
+  "canvasSlice/updateCanvasWithImageData",
+  async (curveLine: number[], thunkAPI) => {
+    const state = thunkAPI.getState() as RootState;
+    const renderer = state.canvasSlice.renderer;
+    if (!renderer) return;
+
+    const prevImageData = await renderer.getDrawable(0)?.getData();
+    const newImageData = toneCorrectionByCurveLine(prevImageData, curveLine);
+
+    renderer?.removeAllDrawable();
+    const blob = new Blob([newImageData.data], {
+      type: "application/octet-stream",
+    });
+
+    const image = new DrawableImage(blob, newImageData);
+    renderer?.addDrawable(image);
   }
 );
 

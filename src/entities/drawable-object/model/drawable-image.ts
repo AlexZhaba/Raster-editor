@@ -9,8 +9,10 @@ export class DrawableImage implements DrawableObject {
 
   private scalePair: [number, number] = [100, 100];
 
-  constructor(file: File | Blob) {
+  constructor(file: File | Blob, imageData?: ImageData) {
     this.imageFile = file;
+    this.imageData = imageData ?? null;
+    this.origImageData = imageData ?? null;
   }
 
   public async init() {
@@ -53,6 +55,8 @@ export class DrawableImage implements DrawableObject {
   public getSize() {
     if (!this.imageData) throw new Error("");
     const { width, height } = this.imageData;
+
+    console.log("inner ", width, height);
 
     return {
       width,

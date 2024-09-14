@@ -95,12 +95,10 @@ interface CurveLine {
 }
 
 export const getCurveLine = ({ startX, startY, endX, endY }: CurveLine) => {
-  const line = new Array(256).fill(0);
+  const line: number[] = new Array(256).fill(0);
 
   const slope = (endY - startY) / (endX - startX);
-  console.log("slope", slope);
   const intercept = (endX * startY - startX * endY) / (endX - startX);
-  console.log("intercept", intercept);
 
   for (let i = 0; i < 256; i++) {
     if (i < startX) {
@@ -114,7 +112,27 @@ export const getCurveLine = ({ startX, startY, endX, endY }: CurveLine) => {
     line[i] = Math.round(i * slope + intercept);
   }
 
-  console.log("line", line);
-
   return line;
+};
+
+export const toneCorrectionByCurveLine = (
+  imageData: ImageData,
+  curveLine: number[]
+) => {
+  const newImageData = new Array(imageData.data.length).fill(0);
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    newImageData[i] = curveLine[imageData.data[i]];
+    newImageData[i + 1] = curveLine[imageData.data[i + 1]];
+    newImageData[i + 2] = curveLine[imageData.data[i + 2]];
+    newImageData[i + 3] = imageData.data[i + 3];
+  }
+
+  const imageDataWithCorrection = new ImageData(
+    imageData.width,
+    imageData.height
+  );
+  imageDataWithCorrection.data.set(newImageData);
+
+  return imageDataWithCorrection;
 };
