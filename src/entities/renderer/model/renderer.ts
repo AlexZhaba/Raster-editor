@@ -31,9 +31,7 @@ export class Renderer {
 
   constructor(parentId: string, canvas: RootCanvas) {
     this.canvas = canvas;
-    console.log("parentId", parentId);
     this.containerId = parentId;
-    console.log("containerId", this.containerId);
 
     this.render();
   }
@@ -118,7 +116,6 @@ export class Renderer {
   }
 
   public resize(scaleX: number, scaleY: number) {
-    console.log("scaleX", scaleX, scaleY);
     for (const drawable of this.drawableList) {
       drawable.resize(scaleX, scaleY);
     }

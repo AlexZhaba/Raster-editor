@@ -37,7 +37,7 @@ export const useDimensionValue = (
       setValueInPercent(value);
       return;
     }
-    setValueInPercent(Math.floor((value / initialValue) * 100));
+    setValueInPercent((value / initialValue) * 100);
   }, [dimension, initialValue, value]);
 
   return {

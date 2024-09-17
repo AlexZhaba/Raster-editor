@@ -34,6 +34,21 @@ export class RootCanvas {
     return context;
   }
 
+  public getRoot() {
+    return this.root;
+  }
+
+  public getCanvasImageData() {
+    const context = this.getContext();
+
+    return context.getImageData(
+      0,
+      0,
+      context.canvas.width,
+      context.canvas.height
+    );
+  }
+
   public setCanvasSize(width: number, height: number) {
     this.root.width = width;
     this.root.height = height;

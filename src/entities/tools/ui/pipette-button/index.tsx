@@ -1,5 +1,5 @@
 import { PushpinFilled } from "@ant-design/icons";
-import { Button } from "antd";
+import { Button, Tooltip } from "antd";
 import React, { MouseEventHandler, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "../../../../app/store";
@@ -31,15 +31,17 @@ export const PipetteButton: React.FC = () => {
 
   return (
     <Container>
-      <Button
-        shape="round"
-        icon={<PushpinFilled />}
-        onClick={onPipetteClick}
-        disabled={isCanvasEmpty}
-        type={isPipetteAction ? 'primary' : 'dashed'}
-      >
-        Pipette
-      </Button>
+      <Tooltip title="Get canvas color">
+        <Button
+          shape="round"
+          icon={<PushpinFilled />}
+          onClick={onPipetteClick}
+          disabled={isCanvasEmpty}
+          type={isPipetteAction ? 'primary' : 'dashed'}
+        >
+          Pipette
+        </Button>
+      </Tooltip>
     </Container>
   )
 }

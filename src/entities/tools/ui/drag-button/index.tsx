@@ -1,5 +1,5 @@
 import { DragOutlined } from "@ant-design/icons";
-import { Button, InputNumber } from "antd";
+import { Button, InputNumber, Tooltip } from "antd";
 import React, { useCallback, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
 import { setActiveTool, setSpeedCoef, startMover, stopMover } from "../../model";
@@ -41,15 +41,17 @@ export const DragButton: React.FC = () => {
 
   return (
     <div className="">
-      <Button
-        shape="round"
-        icon={<DragOutlined />}
-        onClick={handleButtonClick}
-        disabled={isCanvasEmpty}
-        type={isDragAction ? 'primary' : 'dashed'}
-      >
-        Drag
-      </Button>
+      <Tooltip title="Move image">
+        <Button
+          shape="round"
+          icon={<DragOutlined />}
+          onClick={handleButtonClick}
+          disabled={isCanvasEmpty}
+          type={isDragAction ? 'primary' : 'dashed'}
+        >
+          Drag
+        </Button>
+      </Tooltip>
       {isDragAction && (
         <InputNumber value={dragSpeed} onChange={onSpeedChange} />
       )}

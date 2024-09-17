@@ -7,12 +7,17 @@ import { isValidUrl } from "../../../../shared/lib/url";
 
 import { loadImageToCanvasByUrl } from '../../../renderer/model'
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
+import { downloadImageData } from "../../../../shared/lib/download";
 
 export const FileUploader: React.FC = () => {
   const dispatch = useAppDispatch();
 
+  const canvas = useAppSelector(state => state.canvasSlice.canvas)
   const isImageLoad = useAppSelector(state => state.canvasSlice.isLoadingImage)
   const isLastLoadImageFailed = useAppSelector(state => state.canvasSlice.isLastLoadImageFailed)
+  const isCanvasEmpty = useAppSelector(
+    (state) => state.canvasSlice.isCanvasEmpty
+  );
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [mode, setMode] = useState<'FILE' | 'URL'>('FILE')
@@ -52,6 +57,13 @@ export const FileUploader: React.FC = () => {
 
   const onImageUrlChange: React.FormEventHandler<HTMLInputElement> = (event) => {
     setImageUrl(event.currentTarget.value)
+  }
+
+  const handleDownload = () => {
+    if (!canvas) return;
+    const imageData = canvas.getRoot();
+
+    downloadImageData(imageData, `canvas_image_${Date.now()}`)
   }
 
   useEffect(() => {
@@ -98,6 +110,7 @@ export const FileUploader: React.FC = () => {
           />
         </div>
       )}
+      <Button type="primary" disabled={isCanvasEmpty} onClick={handleDownload}>Save</Button>
     </FileContainer>
   )
 }

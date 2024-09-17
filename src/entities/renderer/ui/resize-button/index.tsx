@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, Button, InputNumber, Select, Checkbox } from 'antd'
+import { Modal, Button, InputNumber, Select, Checkbox, Tooltip, Flex } from 'antd'
 import { Container, DimensionInputContainer } from "./styles";
 import { useAppDispatch, useAppSelector } from "../../../../app/store";
 import { CheckboxChangeEvent } from "antd/es/checkbox";
 import { Dimension, useDimensionValue } from "../../../../widgets/top-editor-panel/hooks/use-dimension-value";
 import { resizeImages } from "../..";
+import { HeatMapOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 
 export const ResizeButton: React.FC = () => {
   const dispatch = useAppDispatch()
@@ -114,8 +115,15 @@ export const ResizeButton: React.FC = () => {
           </DimensionInputContainer>
           <DimensionInputContainer>
             <span>Algorithm</span>
-            <Select options={[{ value: 'neighbour', label: 'nearest neighbour' }]} value={"neighbour"} />
+            <Flex gap={16}>
+              <Select options={[{ value: 'neighbour', label: 'nearest neighbour' }]} value={"neighbour"} />
+              <Tooltip title="Nearest Neighbor Interpolation: A fast image resizing algorithm where each pixel in the new image takes the color of the closest pixel from the original image. Advantages: simplicity and high speed. Disadvantages: artifacts and loss of detail.">
+                <QuestionCircleOutlined />
+              </Tooltip>
+            </Flex>
           </DimensionInputContainer>
+          <span>Now: {imagesSize.width}x{imagesSize.height}</span>
+          <span>After: {Math.floor(Number((imagesSize.width ?? 0) * widthInPercent) / 100)}x{Math.floor(Number((imagesSize.height ?? 0) * heightInPercent) / 100)}</span>
         </Container>
       </Modal>
     </>
